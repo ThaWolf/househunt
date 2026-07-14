@@ -1,4 +1,4 @@
-/** DTOs aligned to factory design API_CONTRACT.md (camelCase wire). */
+/** DTOs aligned to factory design API_CONTRACT.md iter 2 (camelCase wire). */
 
 export type PortalId =
   | 'zonaprop'
@@ -12,7 +12,6 @@ export type PropertyType = 'house' | 'apartment' | 'land' | 'other'
 export type Currency = 'USD' | 'ARS'
 export type InterestState = 'active' | 'archived'
 export type VisitStatus = 'none' | 'scheduled' | 'visited'
-export type GeoMode = 'gba' | 'custom'
 export type AdapterStatus = 'ok' | 'partial' | 'error' | 'skipped'
 export type AdapterErrorCode =
   | 'bot_wall'
@@ -21,6 +20,8 @@ export type AdapterErrorCode =
   | 'network'
   | 'not_implemented'
   | 'fixtures_only'
+
+export type ScoreComponentId = 'attrs' | 'area' | 'zone' | 'priceFit' | 'risk'
 
 export interface Money {
   amount: number | null
@@ -55,14 +56,40 @@ export interface Agent {
   phone: string | null
 }
 
-export interface ScoreBreakdown {
-  attrs: number
-  area: number
-  zone: number
-  priceFit: number
-  riskPenalty: number
-  weights: Record<string, number>
-  riskHits: string[]
+export interface ScoreComponent {
+  id: ScoreComponentId
+  label: string
+  score: number
+  maxScore: number
+  barPct: number
+  note?: string | null
+}
+
+export interface RiskHit {
+  term: string
+  label: string
+}
+
+export interface HumanizedReport {
+  summary: string | null
+  appScore: number
+  components: ScoreComponent[]
+  riskHits: RiskHit[]
+  generatedAt: string
+}
+
+export interface Location {
+  query: string
+  locality: string
+  district?: string | null
+  province: string
+  country: 'AR'
+  placeId?: string | null
+}
+
+export interface GeoPlace extends Location {
+  label: string
+  aliases?: string[]
 }
 
 export interface Property {
@@ -82,12 +109,11 @@ export interface Property {
   parking: number | null
   area?: Area
   amenities?: string[]
-  images?: ImageRef[]
+  images: ImageRef[]
   agent?: Agent
   listedAt: string | null
   scrapedAt: string
   appScore: number | null
-  scoreBreakdown?: ScoreBreakdown | null
 }
 
 export interface Visit {
@@ -106,12 +132,8 @@ export interface InterestFlags {
 export interface SearchFilters {
   operation: Operation
   propertyType: PropertyType
-  geo: {
-    mode: GeoMode
-    province?: string | null
-    locality?: string | null
-    neighborhood?: string | null
-  }
+  /** null/omit → preset GBA (no strict geo post-filter). */
+  location?: Location | null
   price?: {
     min?: number | null
     max?: number | null
@@ -199,18 +221,22 @@ export interface AuthResponse extends AuthTokens {
 export interface PropertyDetailResponse {
   property: Property
   interest: InterestFlags
-  report: {
-    summary: string | null
-    riskHits: string[]
-    generatedAt: string
-  } | null
+  report: HumanizedReport | null
   userFieldsEnabled: boolean
+}
+
+export interface AmenityHighlight {
+  token: string
+  label: string
+  present: boolean
 }
 
 export interface InterestItem {
   id: string
   property: Property
   state: InterestState
+  rooms: number | null
+  amenitiesHighlight: AmenityHighlight[]
   userScore: number | null
   visit: Visit
   comments: string | null
@@ -232,6 +258,10 @@ export interface CreateInterestRequest {
 export interface PatchInterestRequest {
   userScore?: number | null
   comments?: string | null
+}
+
+export interface GeoSuggestResponse {
+  items: GeoPlace[]
 }
 
 export interface CalendarEvent {

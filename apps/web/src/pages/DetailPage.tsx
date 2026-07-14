@@ -5,11 +5,13 @@ import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { PropertyDetailResponse, Visit } from '@/api/types'
 import { PORTAL_LABELS } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { HumanizedReportView } from '@/components/HumanizedReportView'
+import { ImageGallery } from '@/components/ImageGallery'
 import { InterestBadge } from '@/components/InterestBadge'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { VisitControls } from '@/components/VisitControls'
-import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
+import { formatLocation, formatMoney } from '@/lib/format'
 
 export function DetailPage() {
   const { propertyId } = useParams<{ propertyId: string }>()
@@ -35,7 +37,6 @@ export function DetailPage() {
       setComments(res.interest?.comments ?? '')
       setVisit(res.interest?.visit ?? { status: 'none', at: null })
 
-      // Resolve interest id when in list (need for patch/archive)
       if (res.interest?.state) {
         const state = res.interest.state
         const list = await interestApi.list(state, 100, 0)
@@ -128,7 +129,6 @@ export function DetailPage() {
   }
 
   const { property, report, userFieldsEnabled, interest } = data
-  const hero = primaryImageUrl(property.images)
   const canAdd =
     !interest?.state || (interest.state !== 'active' && interest.state !== 'archived')
 
@@ -144,49 +144,34 @@ export function DetailPage() {
         </Link>
       </div>
 
-      {/* Full-bleed-ish gallery */}
-      <div className="relative -mx-4 sm:mx-0 mb-6 overflow-hidden sm:rounded-lg bg-ink min-h-[240px] max-h-[420px]">
-        {hero ? (
-          <img
-            src={hero}
-            alt=""
-            className="h-[280px] sm:h-[400px] w-full object-cover opacity-95"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-            }}
-          />
-        ) : (
-          <div className="flex h-[280px] items-center justify-center text-white/40 font-mono text-sm">
-            Sin imagen
+      <ImageGallery images={property.images ?? []} alt={property.title} />
+
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="mb-2 flex flex-wrap gap-2">
+            <InterestBadge interest={interest} />
+            <span className="rounded bg-ink/5 px-1.5 py-0.5 font-mono text-[10px] uppercase text-ink-muted">
+              {PORTAL_LABELS[property.portal]}
+            </span>
           </div>
-        )}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/90 to-transparent p-4 sm:p-6">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <div className="mb-2 flex flex-wrap gap-2">
-                <InterestBadge interest={interest} />
-                <span className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[10px] uppercase text-white/80">
-                  {PORTAL_LABELS[property.portal]}
-                </span>
-              </div>
-              <h1 className="font-display text-3xl sm:text-4xl font-bold text-white leading-tight">
-                {property.title}
-              </h1>
-              <p className="mt-1 font-mono text-teal-300 text-lg">
-                {formatMoney(property.price)}
-              </p>
-            </div>
-            <AppScoreBadge score={property.appScore} size="lg" />
-          </div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-ink leading-tight">
+            {property.title}
+          </h1>
+          <p className="mt-1 font-mono text-accent text-lg">
+            {formatMoney(property.price)}
+          </p>
+          <p className="mt-1 text-sm text-ink-muted">
+            {formatLocation(property.address)}
+          </p>
         </div>
+        <AppScoreBadge score={property.appScore} size="lg" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <section className="space-y-4">
-          <p className="text-sm text-ink-muted">{formatLocation(property.address)}</p>
           <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
             <div>
-              <dt className="hh-label">Ambientes</dt>
+              <dt className="hh-label">Habitaciones</dt>
               <dd className="font-mono">{property.rooms ?? '—'}</dd>
             </div>
             <div>
@@ -211,6 +196,19 @@ export function DetailPage() {
             </div>
           </dl>
 
+          {property.amenities && property.amenities.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {property.amenities.map((a) => (
+                <span
+                  key={a}
+                  className="rounded bg-accent-soft px-2 py-0.5 font-mono text-[11px] text-accent"
+                >
+                  {a}
+                </span>
+              ))}
+            </div>
+          )}
+
           {property.description && (
             <div>
               <h2 className="font-display text-xl font-semibold mb-2">Descripción</h2>
@@ -220,33 +218,10 @@ export function DetailPage() {
             </div>
           )}
 
-          <div className="rounded-lg border border-line bg-surface p-4">
-            <h2 className="font-display text-xl font-semibold mb-2">
-              Reporte Househunt
-            </h2>
-            {report ? (
-              <>
-                <p className="text-sm mb-2">{report.summary ?? 'Sin resumen.'}</p>
-                {report.riskHits?.length > 0 && (
-                  <ul className="list-disc pl-5 text-sm text-warn">
-                    {report.riskHits.map((r) => (
-                      <li key={r}>{r}</li>
-                    ))}
-                  </ul>
-                )}
-                <p className="mt-2 font-mono text-[10px] text-ink-muted">
-                  {report.generatedAt}
-                </p>
-              </>
-            ) : (
-              <p className="text-sm text-ink-muted">Reporte aún no generado.</p>
-            )}
-            {property.scoreBreakdown && (
-              <pre className="mt-3 overflow-auto rounded bg-paper p-2 font-mono text-[10px] text-ink-muted">
-                {JSON.stringify(property.scoreBreakdown, null, 2)}
-              </pre>
-            )}
-          </div>
+          <HumanizedReportView
+            report={report}
+            fallbackAppScore={property.appScore}
+          />
 
           <a
             href={property.sourceUrl}

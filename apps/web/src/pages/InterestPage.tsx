@@ -2,11 +2,34 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { interestApi, propertiesApi } from '@/api/endpoints'
-import type { InterestItem } from '@/api/types'
+import type { AmenityHighlight, InterestItem } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
+
+function AmenityCell({ items }: { items: AmenityHighlight[] }) {
+  if (!items?.length) {
+    return <span className="text-ink-muted">—</span>
+  }
+  return (
+    <div className="flex flex-wrap gap-1">
+      {items.map((a) => (
+        <span
+          key={a.token}
+          title={a.label}
+          className={`inline-flex items-center rounded px-1 py-0.5 font-mono text-[10px] ${
+            a.present
+              ? 'bg-accent-soft text-accent'
+              : 'bg-paper text-ink-muted/60 line-through decoration-ink-muted/30'
+          }`}
+        >
+          {a.present ? '✓' : '—'} {a.label}
+        </span>
+      ))}
+    </div>
+  )
+}
 
 export function InterestPage() {
   const [items, setItems] = useState<InterestItem[]>([])
@@ -82,7 +105,7 @@ export function InterestPage() {
         <div>
           <h1 className="font-display text-4xl font-bold text-ink">Interés</h1>
           <p className="text-sm text-ink-muted">
-            Tabla densa — UserScore 1–10 (numérico), visita, archivar.
+            Tabla densa — rooms, amenities (pileta/jardín), UserScore, visita.
           </p>
         </div>
         <Link to="/archived" className="hh-btn-ghost no-underline text-sm">
@@ -103,14 +126,15 @@ export function InterestPage() {
         </p>
       ) : (
         <div className="overflow-x-auto rounded border border-line bg-surface">
-          <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[1020px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-line bg-paper/80 text-[10px] uppercase tracking-wide text-ink-muted font-mono">
                 <th className="px-2 py-2 font-medium w-12" />
                 <th className="px-2 py-2 font-medium">Título</th>
                 <th className="px-2 py-2 font-medium">Precio</th>
-                <th className="px-2 py-2 font-medium">Zona</th>
-                <th className="px-2 py-2 font-medium">Amb</th>
+                <th className="px-2 py-2 font-medium">Localidad</th>
+                <th className="px-2 py-2 font-medium">Rooms</th>
+                <th className="px-2 py-2 font-medium">Amenities</th>
                 <th className="px-2 py-2 font-medium">App</th>
                 <th className="px-2 py-2 font-medium">User</th>
                 <th className="px-2 py-2 font-medium">Visita</th>
@@ -121,6 +145,7 @@ export function InterestPage() {
             <tbody>
               {items.map((item) => {
                 const thumb = primaryImageUrl(item.property.images)
+                const rooms = item.rooms ?? item.property.rooms
                 return (
                   <tr
                     key={item.id}
@@ -150,7 +175,10 @@ export function InterestPage() {
                       {formatLocation(item.property.address)}
                     </td>
                     <td className="px-2 py-1.5 font-mono text-xs">
-                      {item.property.rooms ?? '—'}
+                      {rooms ?? '—'}
+                    </td>
+                    <td className="px-2 py-1.5 max-w-[200px]">
+                      <AmenityCell items={item.amenitiesHighlight ?? []} />
                     </td>
                     <td className="px-2 py-1.5">
                       <AppScoreBadge score={item.property.appScore} size="sm" />

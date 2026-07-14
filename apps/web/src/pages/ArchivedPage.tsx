@@ -73,7 +73,8 @@ export function ArchivedPage() {
                 <th className="px-2 py-2 w-12" />
                 <th className="px-2 py-2">Título</th>
                 <th className="px-2 py-2">Precio</th>
-                <th className="px-2 py-2">Zona</th>
+                <th className="px-2 py-2">Localidad</th>
+                <th className="px-2 py-2">Rooms</th>
                 <th className="px-2 py-2">App</th>
                 <th className="px-2 py-2">User</th>
                 <th className="px-2 py-2">Acciones</th>
@@ -104,6 +105,9 @@ export function ArchivedPage() {
                     </td>
                     <td className="px-2 py-1.5 text-xs text-ink-muted truncate max-w-[160px]">
                       {formatLocation(item.property.address)}
+                    </td>
+                    <td className="px-2 py-1.5 font-mono text-xs">
+                      {item.rooms ?? item.property.rooms ?? '—'}
                     </td>
                     <td className="px-2 py-1.5">
                       <AppScoreBadge score={item.property.appScore} size="sm" />

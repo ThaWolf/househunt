@@ -33,7 +33,12 @@ export function ResultsPage() {
           <h1 className="font-display text-4xl font-bold text-ink">Resultados</h1>
           <p className="text-sm text-ink-muted font-mono">
             {data.items.length} props · {data.tookMs} ms ·{' '}
-            {data.filters.geo.mode === 'gba' ? 'GBA' : 'custom'}
+            {data.filters.location
+              ? data.filters.location.locality
+              : 'GBA (preset)'}
+            {data.filters.rooms?.min != null
+              ? ` · ≥${data.filters.rooms.min} hab`
+              : ''}
           </p>
         </div>
         <Link to="/search" className="hh-btn-ghost no-underline text-sm">

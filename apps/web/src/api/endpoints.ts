@@ -5,6 +5,7 @@ import type {
   CalendarResponse,
   CalendarSyncResponse,
   CreateInterestRequest,
+  GeoSuggestResponse,
   InterestListResponse,
   InterestItem,
   LoginRequest,
@@ -43,6 +44,14 @@ export const searchApi = {
       method: 'POST',
       body: filters,
     }),
+}
+
+export const geoApi = {
+  suggest: (q: string, signal?: AbortSignal) =>
+    apiRequest<GeoSuggestResponse>(
+      `/api/geo/suggest?q=${encodeURIComponent(q)}`,
+      { signal },
+    ),
 }
 
 export const propertiesApi = {

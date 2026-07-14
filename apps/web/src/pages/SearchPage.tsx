@@ -2,19 +2,37 @@ import { useMemo, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { searchApi } from '@/api/endpoints'
-import type { Currency, PortalId, PropertyType, SearchFilters } from '@/api/types'
+import type {
+  Currency,
+  GeoPlace,
+  Location,
+  PortalId,
+  PropertyType,
+  SearchFilters,
+} from '@/api/types'
 import { ALL_PORTALS, PORTAL_LABELS } from '@/api/types'
 import { LoadingState } from '@/components/LoadingState'
+import { LocationAutocomplete } from '@/components/LocationAutocomplete'
 
 const LAST_SEARCH_KEY = 'hh_last_search'
 
+function toLocationBody(place: GeoPlace): Location {
+  return {
+    query: place.query || place.label,
+    locality: place.locality,
+    district: place.district ?? null,
+    province: place.province,
+    country: 'AR',
+    placeId: place.placeId ?? null,
+  }
+}
+
 export function SearchPage() {
   const navigate = useNavigate()
-  const [geoMode, setGeoMode] = useState<'gba' | 'custom'>('gba')
   const [propertyType, setPropertyType] = useState<PropertyType>('house')
-  const [province, setProvince] = useState('')
-  const [locality, setLocality] = useState('')
-  const [neighborhood, setNeighborhood] = useState('')
+  const [locationText, setLocationText] = useState('')
+  const [location, setLocation] = useState<Location | null>(null)
+  const [gbaWide, setGbaWide] = useState(true)
   const [priceMin, setPriceMin] = useState('')
   const [priceMax, setPriceMax] = useState('')
   const [currency, setCurrency] = useState<Currency>('USD')
@@ -32,12 +50,7 @@ export function SearchPage() {
     const f: SearchFilters = {
       operation: 'buy',
       propertyType,
-      geo: {
-        mode: geoMode,
-        province: geoMode === 'custom' ? province || null : null,
-        locality: geoMode === 'custom' ? locality || null : null,
-        neighborhood: neighborhood || null,
-      },
+      location: gbaWide || !location ? null : location,
       price: {
         min: priceMin ? Number(priceMin) : null,
         max: priceMax ? Number(priceMax) : null,
@@ -55,11 +68,9 @@ export function SearchPage() {
     }
     return f
   }, [
-    geoMode,
     propertyType,
-    province,
-    locality,
-    neighborhood,
+    location,
+    gbaWide,
     priceMin,
     priceMax,
     currency,
@@ -78,11 +89,16 @@ export function SearchPage() {
     )
   }
 
+  function onSelectPlace(place: GeoPlace) {
+    setLocation(toLocationBody(place))
+    setGbaWide(false)
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
-    if (geoMode === 'custom' && !province.trim()) {
-      setError('Indicá provincia en modo personalizado')
+    if (!gbaWide && !location) {
+      setError('Elegí una ubicación del autocomplete, o marcá “Buscar en todo GBA”')
       return
     }
     if (!portals.length) {
@@ -111,7 +127,7 @@ export function SearchPage() {
     <div className="animate-fade-in max-w-3xl">
       <h1 className="font-display text-4xl font-bold text-ink mb-1">Buscar</h1>
       <p className="text-sm text-ink-muted mb-6">
-        Confirmá filtros → scrap on-demand. Default GBA; podés ampliar a todo el país.
+        Ubicación con autocomplete → scrap on-demand. Sin ubicación = preset GBA.
       </p>
 
       <form
@@ -138,66 +154,29 @@ export function SearchPage() {
           </div>
         </div>
 
-        <fieldset>
-          <legend className="hh-label">Zona</legend>
-          <div className="flex gap-3 mb-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="radio"
-                checked={geoMode === 'gba'}
-                onChange={() => setGeoMode('gba')}
-              />
-              GBA (preset)
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="radio"
-                checked={geoMode === 'custom'}
-                onChange={() => setGeoMode('custom')}
-              />
-              Personalizado (nacional)
-            </label>
-          </div>
-          {geoMode === 'custom' && (
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div>
-                <label className="hh-label">Provincia</label>
-                <input
-                  className="hh-input"
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="hh-label">Localidad</label>
-                <input
-                  className="hh-input"
-                  value={locality}
-                  onChange={(e) => setLocality(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="hh-label">Barrio</label>
-                <input
-                  className="hh-input"
-                  value={neighborhood}
-                  onChange={(e) => setNeighborhood(e.target.value)}
-                />
-              </div>
-            </div>
-          )}
-          {geoMode === 'gba' && (
-            <div>
-              <label className="hh-label">Barrio (opcional)</label>
-              <input
-                className="hh-input"
-                value={neighborhood}
-                onChange={(e) => setNeighborhood(e.target.value)}
-                placeholder="Ej. Vicente López"
-              />
-            </div>
-          )}
+        <fieldset className="space-y-3">
+          <LocationAutocomplete
+            value={location}
+            inputText={locationText}
+            onInputTextChange={setLocationText}
+            onSelect={onSelectPlace}
+            onClearLocation={() => setLocation(null)}
+          />
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={gbaWide}
+              onChange={(e) => {
+                const checked = e.target.checked
+                setGbaWide(checked)
+                if (checked) {
+                  setLocation(null)
+                  setLocationText('')
+                }
+              }}
+            />
+            Buscar en todo GBA (limpia ubicación)
+          </label>
         </fieldset>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -234,16 +213,20 @@ export function SearchPage() {
 
         <div className="grid gap-3 sm:grid-cols-4">
           <div>
-            <label className="hh-label">Ambientes min</label>
+            <label className="hh-label" htmlFor="rooms-min">
+              Habitaciones mín.
+            </label>
             <input
+              id="rooms-min"
               type="number"
+              min={0}
               className="hh-input"
               value={roomsMin}
               onChange={(e) => setRoomsMin(e.target.value)}
             />
           </div>
           <div>
-            <label className="hh-label">Baños min</label>
+            <label className="hh-label">Baños mín.</label>
             <input
               type="number"
               className="hh-input"
@@ -273,7 +256,7 @@ export function SearchPage() {
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="hh-label">Cocheras min</label>
+            <label className="hh-label">Cocheras mín.</label>
             <input
               type="number"
               className="hh-input"
