@@ -30,7 +30,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://househunt:househunt@postgres:5432/househunt
       CORS_ORIGINS: http://localhost:5173
       FRONTEND_URL: http://localhost:5173
-      ADAPTER_USE_FIXTURES: "true"
+      ADAPTER_USE_FIXTURES: "false"
+      ADAPTER_TIMEOUT_SECONDS: "45"
       FEATURE_GOOGLE_CALENDAR: "false"
       FEATURE_GOOGLE_MAPS: "false"
       # Optional: host/.env substitution; empty = degrade (env_file also loads .env)
