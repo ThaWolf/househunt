@@ -23,6 +23,12 @@ export function PortalErrorsBanner({
             <span className="text-ink">{PORTAL_LABELS[p.portal]}</span>
             {' · '}
             {p.status}
+            {p.diagnostics
+              ? ` · raw ${p.diagnostics.rawCount}→${p.diagnostics.afterFilterCount}`
+              : p.pagination?.listingsRaw != null
+                ? ` · raw ${p.pagination.listingsRaw}→${p.pagination.listingsAfterFilter ?? '—'}`
+                : null}
+            {p.diagnostics?.roomsFilterWiped ? ' · rooms wipe' : null}
             {p.error ? ` — ${p.error.message}` : null}
             {p.unsupportedFilters?.length
               ? ` (filtros ignorados: ${p.unsupportedFilters.join(', ')})`

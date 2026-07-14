@@ -1,4 +1,4 @@
-/** DTOs aligned to factory design API_CONTRACT.md iter 4 (camelCase wire). */
+/** DTOs aligned to factory design API_CONTRACT.md iter 5 (camelCase wire). */
 
 export type PortalId =
   | 'zonaprop'
@@ -13,6 +13,12 @@ export type Currency = 'USD' | 'ARS'
 export type InterestState = 'active' | 'archived'
 export type VisitStatus = 'none' | 'scheduled' | 'visited'
 export type AdapterStatus = 'ok' | 'partial' | 'error' | 'skipped'
+/** E23/E25 — adapter maturity for ops + diagnostics. */
+export type AdapterMaturity =
+  | 'live_ok'
+  | 'live_partial'
+  | 'not_implemented'
+  | 'broken'
 export type AdapterErrorCode =
   | 'bot_wall'
   | 'rate_limit'
@@ -20,6 +26,16 @@ export type AdapterErrorCode =
   | 'network'
   | 'not_implemented'
   | 'fixtures_only'
+  | 'auth_required'
+  | 'filtered_rooms_null'
+/** E23 — empty search UX kind. */
+export type EmptyStateKind =
+  | 'ok'
+  | 'no_inventory'
+  | 'rooms_filter_wipe'
+  | 'all_partial'
+  | 'all_skipped'
+  | 'all_error'
 
 /** Canonical id is riskSafety; legacy wire `risk` accepted and normalized in UI. */
 export type ScoreComponentId =
@@ -257,17 +273,60 @@ export interface AdapterPaginationMeta {
   dataSourceHint?: DataSourceHint | null
 }
 
+export interface PortalDiagnostics {
+  rawCount: number
+  afterFilterCount: number
+  roomsDropped: number
+  roomsFilterWiped: boolean
+  maturity: AdapterMaturity
+  dropReasons?: Array<
+    'rooms_null' | 'rooms_below_min' | 'geo' | 'price' | 'other'
+  >
+}
+
 export interface PortalSearchResult {
   portal: PortalId
   status: AdapterStatus
+  /** Mirror of diagnostics.maturity (E23 convenience). */
+  maturity?: AdapterMaturity
   count?: number
   unsupportedFilters?: string[]
   pagination?: AdapterPaginationMeta | null
+  diagnostics?: PortalDiagnostics
   error?: {
     code: AdapterErrorCode
     message: string
     retryable: boolean
   } | null
+}
+
+export interface EmptyStateHint {
+  kind: EmptyStateKind
+  title: string
+  body: string
+  hint?: string | null
+}
+
+export interface SearchDiagnosticsPortalRow {
+  portal: PortalId
+  rawCount: number
+  afterFilterCount: number
+  roomsDropped: number
+  roomsFilterWiped: boolean
+  maturity: AdapterMaturity
+  status: AdapterStatus
+  errorCode?: AdapterErrorCode | null
+}
+
+/** E23 — required on SearchResponse i5. */
+export interface SearchDiagnostics {
+  rawCount: number
+  afterFilterCount: number
+  roomsDropped: number
+  roomsFilterWiped: boolean
+  portals: SearchDiagnosticsPortalRow[]
+  /** Required when items.length === 0; null when items > 0. */
+  emptyState?: EmptyStateHint | null
 }
 
 export interface SearchResultItem extends Property {
@@ -279,6 +338,8 @@ export interface SearchResponse {
   filters: SearchFilters
   items: SearchResultItem[]
   portalResults: PortalSearchResult[]
+  /** E23 — required i5; optional for session payloads from older iters. */
+  diagnostics?: SearchDiagnostics
   density?: {
     totalItems?: number
     portalsWithMultiPage?: number
@@ -401,6 +462,7 @@ export interface AdaptersMetaResponse {
   portals: Array<{
     id: PortalId
     enabled: boolean
+    maturity?: AdapterMaturity
     analysisStatus: string
     hybridDefault?: boolean
   }>
@@ -411,6 +473,34 @@ export interface AdaptersMetaResponse {
     poi?: boolean
     hybridAdapters?: boolean
   }
+}
+
+/** Canonical empty-state copy (E23) when BE omits emptyState but items=[]. */
+export const EMPTY_STATE_COPY: Record<
+  Exclude<EmptyStateKind, 'ok'>,
+  { title: string; body: string; hint?: string }
+> = {
+  rooms_filter_wipe: {
+    title: 'Sin resultados con ese filtro de ambientes',
+    body: 'Encontramos avisos, pero ninguno pasó el mínimo de habitaciones (faltaba dato o eran menos). Probá bajar ambientes o buscar sin mínimo.',
+    hint: 'Bajá el mínimo de habitaciones o quitá el filtro.',
+  },
+  no_inventory: {
+    title: 'Sin avisos en esta zona',
+    body: 'Los portales no devolvieron inventario para esta búsqueda.',
+  },
+  all_partial: {
+    title: 'Búsqueda incompleta',
+    body: 'Varios portales respondieron parcial; no hay listados que cumplan los filtros.',
+  },
+  all_skipped: {
+    title: 'Portales no disponibles',
+    body: 'Los scrapers están deshabilitados o aún no implementados.',
+  },
+  all_error: {
+    title: 'No pudimos consultar portales',
+    body: 'Errores de red, anti-bot o auth. Reintentá en unos minutos.',
+  },
 }
 
 export const ALL_PORTALS: PortalId[] = [

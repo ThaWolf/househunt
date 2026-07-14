@@ -11,7 +11,7 @@ import type {
   SearchFilters,
 } from '@/api/types'
 import { ALL_PORTALS, PORTAL_LABELS } from '@/api/types'
-import { LoadingState } from '@/components/LoadingState'
+import { SearchLoadingProgress } from '@/components/LoadingState'
 import { LocationAutocomplete } from '@/components/LocationAutocomplete'
 
 const LAST_SEARCH_KEY = 'hh_last_search'
@@ -120,7 +120,9 @@ export function SearchPage() {
   }
 
   if (busy) {
-    return <LoadingState label="Buscando en portales… esto puede tardar" />
+    return (
+      <SearchLoadingProgress label="Buscando en portales… esto puede tardar" />
+    )
   }
 
   return (

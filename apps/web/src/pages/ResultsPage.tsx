@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { SearchResponse } from '@/api/types'
 import { DataSourceBanner } from '@/components/DataSourceBanner'
+import { EmptyStatePanel } from '@/components/EmptyStatePanel'
+import { PortalDiagnosticsStrip } from '@/components/PortalDiagnostics'
 import { PortalErrorsBanner } from '@/components/PortalErrors'
 import { PropertyCard } from '@/components/PropertyCard'
 import { ErrorState } from '@/components/LoadingState'
@@ -27,6 +29,8 @@ export function ResultsPage() {
     )
   }
 
+  const empty = data.items.length === 0
+
   return (
     <div className="animate-fade-in">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -40,6 +44,7 @@ export function ResultsPage() {
             {data.filters.rooms?.min != null
               ? ` · ≥${data.filters.rooms.min} hab`
               : ''}
+            {data.diagnostics?.roomsFilterWiped ? ' · rooms wipe' : ''}
           </p>
         </div>
         <Link to="/search" className="hh-btn-ghost no-underline text-sm">
@@ -48,12 +53,13 @@ export function ResultsPage() {
       </div>
 
       <PortalErrorsBanner portalResults={data.portalResults} />
+      {!empty ? (
+        <PortalDiagnosticsStrip response={data} compact />
+      ) : null}
       <DataSourceBanner items={data.items} density={data.density} />
 
-      {data.items.length === 0 ? (
-        <p className="text-ink-muted py-12 text-center">
-          Ningún resultado. Probá otros filtros o revisá errores de portal arriba.
-        </p>
+      {empty ? (
+        <EmptyStatePanel response={data} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.items.map((item) => (
