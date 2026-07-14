@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "factory/**"]
+  pull_request:
+    branches: [main, "factory/**"]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: services/api/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Pytest
+        env:
+          JWT_SECRET: ci-test-secret-not-for-prod
+          ADAPTER_USE_FIXTURES: "true"
+          DATABASE_URL: sqlite+aiosqlite:///:memory:
+        run: pytest -q
+
+  web:
+    name: Web (build + test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Test
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  docker:
+    name: Docker build (optional)
+    # Keep PR feedback fast: only on PRs, and only after api+web pass.
+    if: github.event_name == 'pull_request'
+    needs: [api, web]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Opción A image
+        run: docker build -t househunt:ci .

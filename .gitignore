@@ -1,15 +1,41 @@
+# Secrets / env
 .env
-.env.local
+.env.*
+!.env.example
 *.local.env
+secrets.local.env
+**/secrets.local.env
+*.pem
+*.key
+id_rsa*
+.credentials
+
+# Python
 .venv/
 venv/
 __pycache__/
 *.py[cod]
+*$py.class
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+*.egg-info/
+.coverage
+htmlcov/
+.tox/
+
+# Node / frontend
 node_modules/
 dist/
-*.egg-info/
+*.tsbuildinfo
+
+# Build / tooling
 .DS_Store
+*.log
+.idea/
+.vscode/
+!.vscode/extensions.json
+
+# Opción A: FE assets copied into API static (keep static dir, ignore built assets)
 services/api/static/assets/
+services/api/static/index.html
