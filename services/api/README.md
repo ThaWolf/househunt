@@ -45,5 +45,18 @@ Calendar sync requires `FEATURE_GOOGLE_CALENDAR=true` and complete `GOOGLE_OAUTH
 
 ## Adapters
 
-Five portals under `app/adapters/` (zonaprop, argenprop, mercadolibre, remax, century21).  
-Default `ADAPTER_USE_FIXTURES=true` for reliable MVP. Century21 can probe Hydra at `century21.com.ar/api` when fixtures off.
+Five portals under `app/adapters/` (zonaprop, argenprop, mercadolibre, remax, century21).
+
+**Default `ADAPTER_USE_FIXTURES=false`** (local-real): ZonaProp + Mercado Libre scrape live via Playwright
+and return real `sourceUrl` + portal CDN images with `dataSource=live`. On bot_wall / failure the portal
+returns **empty** with a typed error — never invents listings.
+
+Curated fixtures (`sample_listings.json`) are empty by default after iter-4 purge (picsum / fake `/zp-NNNN.html` removed).
+Set `ADAPTER_USE_FIXTURES=true` only for offline demos once you add verified `fixture_curated` rows.
+
+`ADAPTER_TIMEOUT_SECONDS` default **45** (Playwright needs headroom). Rate-limit ≈ 1 req / 3s between browser fetches.
+
+```bash
+# Playwright browsers (first time)
+python -m playwright install chromium
+```

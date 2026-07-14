@@ -50,9 +50,9 @@ class Settings(BaseSettings):
     )
     adapter_remax_enabled: bool = Field(default=True, alias="ADAPTER_REMAX_ENABLED")
     adapter_century21_enabled: bool = Field(default=True, alias="ADAPTER_CENTURY21_ENABLED")
-    adapter_use_fixtures: bool = Field(default=True, alias="ADAPTER_USE_FIXTURES")
+    adapter_use_fixtures: bool = Field(default=False, alias="ADAPTER_USE_FIXTURES")
     adapter_hybrid_default: bool = Field(default=True, alias="ADAPTER_HYBRID_DEFAULT")
-    adapter_timeout_seconds: float = Field(default=12.0, alias="ADAPTER_TIMEOUT_SECONDS")
+    adapter_timeout_seconds: float = Field(default=45.0, alias="ADAPTER_TIMEOUT_SECONDS")
     adapter_max_pages: int = Field(default=3, alias="ADAPTER_MAX_PAGES")
     adapter_page_size_hint: int = Field(default=20, alias="ADAPTER_PAGE_SIZE_HINT")
 
@@ -107,7 +107,9 @@ class Settings(BaseSettings):
         return mapping.get(portal, False)
 
     def analysis_status(self, portal: str) -> Literal["ready", "needs_probe"]:
-        return "ready" if portal == "century21" else "needs_probe"
+        if portal in ("century21", "zonaprop", "mercadolibre"):
+            return "ready"
+        return "needs_probe"
 
 
 @lru_cache

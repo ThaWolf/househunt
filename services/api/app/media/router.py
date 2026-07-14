@@ -8,6 +8,7 @@ import httpx
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import Response
 
+from app.adapters.veracity import is_banned_image_host
 from app.auth.deps import get_current_user
 from app.config import get_settings
 from app.db.models import User
@@ -18,17 +19,18 @@ router = APIRouter(prefix="/media", tags=["media"])
 ALLOWED_HOST_SUFFIXES = (
     "zonaprop.com.ar",
     "zonapropcdn.com",
+    "naventcdn.com",
     "argenprop.com",
     "mercadolibre.com.ar",
     "mlstatic.com",
     "remax.com.ar",
     "century21.com.ar",
-    "picsum.photos",
-    "placehold.co",
 )
 
 
 def _host_allowed(url: str) -> bool:
+    if is_banned_image_host(url):
+        return False
     host = urlparse(url).hostname or ""
     host = host.lower()
     return any(host == s or host.endswith("." + s) for s in ALLOWED_HOST_SUFFIXES)

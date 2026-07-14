@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Literal  # noqa: F401 — used by ScoreComponent / density hints
 from uuid import UUID
 
 from pydantic import Field, model_validator
@@ -14,6 +14,7 @@ from app.schemas.common import (
     Area,
     CamelModel,
     Currency,
+    DataSource,
     GeoMode,
     GeoPoint,
     GeocodeSource,
@@ -41,6 +42,7 @@ class PropertyDTO(CamelModel):
     portal: PortalId
     external_id: str
     source_url: str
+    data_source: DataSource
     title: str
     description: str | None = None
     description_excerpt: str | None = None
@@ -140,6 +142,7 @@ class AdapterPaginationMetaDTO(CamelModel):
     max_pages: int = 3
     page_size_hint: int = 20
     mode: SearchModeHint | None = None
+    data_source_hint: DataSource | Literal["mixed"] | None = None
 
 
 class PortalSearchResult(CamelModel):
@@ -155,6 +158,7 @@ class SearchDensity(CamelModel):
     total_items: int
     portals_with_multi_page: int = 0
     mode: SearchModeHint = SearchModeHint.hybrid
+    data_source_hint: DataSource | Literal["mixed"] | None = None
 
 
 class SearchResultItem(PropertyDTO):

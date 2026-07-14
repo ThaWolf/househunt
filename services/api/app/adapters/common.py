@@ -1,4 +1,4 @@
-"""Shared adapter helpers: fixtures + hybrid live probe + dense fallback."""
+"""Shared adapter helpers: optional curated fixtures + honest live/hybrid."""
 
 from __future__ import annotations
 
@@ -9,8 +9,9 @@ import httpx
 from app.adapters.base import unsupported_from_filters
 from app.adapters.fixtures.loader import load_fixture_properties
 from app.adapters.types import AdapterError, AdapterPaginationMeta, AdapterResult, RawProperty
+from app.adapters.veracity import normalize_data_source
 from app.config import Settings, get_settings
-from app.schemas.common import AdapterErrorCode, AdapterStatus, PortalId
+from app.schemas.common import AdapterErrorCode, AdapterStatus, DataSource, PortalId
 from app.schemas.property import SearchFilters
 
 logger = logging.getLogger(__name__)
@@ -118,7 +119,7 @@ async def probe_url(url: str, timeout: float) -> tuple[bool, str | None]:
         return False, "network"
 
 
-def dense_fixture_slice(
+def curated_fixture_slice(
     portal: PortalId,
     filters: SearchFilters,
     *,
@@ -126,14 +127,19 @@ def dense_fixture_slice(
     page_size: int,
     mode: str,
 ) -> tuple[list[RawProperty], AdapterPaginationMeta]:
-    """Return dense fixtures (≥8–15 typical) with pagination meta — never 1-item fallback."""
+    """Return curated fixtures only (may be empty). Never invent listings."""
     raw_all = load_fixture_properties(portal)
+    for item in raw_all:
+        item.data_source = normalize_data_source(
+            (item.raw_hints or {}).get("dataSource") or DataSource.fixture_curated
+        )
     filtered = filter_raw_items(raw_all, filters)
-    cap = max(page_size * max_pages, 15)
+    cap = max(page_size * max_pages, page_size)
     items = filtered[:cap]
     pages_fetched = 0
     if items:
         pages_fetched = min(max_pages, max(1, (len(items) + page_size - 1) // page_size))
+    hint = DataSource.fixture_curated.value if items else None
     pagination = AdapterPaginationMeta(
         pages_fetched=pages_fetched,
         listings_raw=len(raw_all),
@@ -141,8 +147,44 @@ def dense_fixture_slice(
         max_pages=max_pages,
         page_size_hint=page_size,
         mode=mode,
+        data_source_hint=hint,
     )
     return items, pagination
+
+
+# Back-compat alias
+dense_fixture_slice = curated_fixture_slice
+
+
+def empty_result(
+    portal: PortalId,
+    filters: SearchFilters,
+    *,
+    settings: Settings,
+    code: AdapterErrorCode,
+    message: str,
+    status: AdapterStatus = AdapterStatus.error,
+    retryable: bool = True,
+    mode: str = "live",
+) -> AdapterResult:
+    max_pages, page_size = _pagination_knobs(filters, settings)
+    unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
+    return AdapterResult(
+        portal=portal,
+        status=status,
+        items=[],
+        unsupported_filters=unsupported,
+        pagination=AdapterPaginationMeta(
+            pages_fetched=0,
+            listings_raw=0,
+            listings_after_filter=0,
+            max_pages=max_pages,
+            page_size_hint=page_size,
+            mode=mode,
+            data_source_hint=None,
+        ),
+        error=AdapterError(code=code, message=message, retryable=retryable),
+    )
 
 
 async def fetch_with_fixtures(
@@ -153,15 +195,19 @@ async def fetch_with_fixtures(
     analysis_status: str = "needs_probe",
     try_live: bool = False,
 ) -> AdapterResult:
-    """Fixtures-only or hybrid: live probe → on fail/bot_wall merge dense fixtures."""
+    """
+    Fixtures-only OR honest live-empty path for portals without a live scraper.
+
+    On bot_wall / probe failure: return empty + typed error — never invent listings.
+    """
     _ = analysis_status
+    _ = try_live
     settings = settings or get_settings()
     unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
     max_pages, page_size = _pagination_knobs(filters, settings)
 
-    # ADAPTER_USE_FIXTURES=true → dense fixtures (CI/default)
     if settings.adapter_use_fixtures:
-        items, pagination = dense_fixture_slice(
+        items, pagination = curated_fixture_slice(
             portal, filters, max_pages=max_pages, page_size=page_size, mode="fixtures"
         )
         return AdapterResult(
@@ -172,48 +218,73 @@ async def fetch_with_fixtures(
             pagination=pagination,
             error=AdapterError(
                 code=AdapterErrorCode.fixtures_only,
-                message="Serving dense fixture listings (ADAPTER_USE_FIXTURES)",
+                message=(
+                    "Serving curated fixtures (ADAPTER_USE_FIXTURES); "
+                    f"{len(items)} items — empty set is valid (veracity > density)"
+                ),
                 retryable=True,
             ),
         )
 
-    # Hybrid path (ADAPTER_USE_FIXTURES=false): probe live; on fail merge dense fixtures
+    # Live preferred but no scraper for this portal → skip inventing
     url = PROBE_URLS[portal]
-    ok, err = await probe_url(url, settings.adapter_timeout_seconds)
-    items, pagination = dense_fixture_slice(
-        portal, filters, max_pages=max_pages, page_size=page_size, mode="hybrid"
-    )
+    ok, err = await probe_url(url, min(settings.adapter_timeout_seconds, 12.0))
     if not ok:
         code = AdapterErrorCode(err or "network")
-        return AdapterResult(
-            portal=portal,
-            status=AdapterStatus.partial if items else AdapterStatus.error,
-            items=items,
-            unsupported_filters=unsupported,
-            pagination=pagination,
-            error=AdapterError(
-                code=code,
-                message=(
-                    f"Live probe failed for {portal.value} ({code.value}); "
-                    f"returning dense fixtures ({len(items)} items)"
-                ),
-                retryable=code
-                in (
-                    AdapterErrorCode.network,
-                    AdapterErrorCode.rate_limit,
-                    AdapterErrorCode.bot_wall,
-                ),
+        return empty_result(
+            portal,
+            filters,
+            settings=settings,
+            code=code,
+            message=(
+                f"Live path unavailable for {portal.value} ({code.value}); "
+                "returning empty (no invented listings)"
             ),
+            status=AdapterStatus.error,
+            mode="live",
         )
 
-    # Live ok — parse deferred; dense fixtures as floor with hybrid meta
-    if try_live or settings.adapter_hybrid_default:
-        pagination.pages_fetched = max(pagination.pages_fetched, 1)
+    return empty_result(
+        portal,
+        filters,
+        settings=settings,
+        code=AdapterErrorCode.not_implemented,
+        message=(
+            f"Live scrape not implemented for {portal.value}; "
+            "omitting results rather than inventing listings"
+        ),
+        status=AdapterStatus.skipped,
+        retryable=False,
+        mode="live",
+    )
+
+
+def live_ok_result(
+    portal: PortalId,
+    filters: SearchFilters,
+    items: list[RawProperty],
+    *,
+    settings: Settings,
+    pages_fetched: int = 1,
+) -> AdapterResult:
+    max_pages, page_size = _pagination_knobs(filters, settings)
+    unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
+    filtered = filter_raw_items(items, filters)
+    for item in filtered:
+        item.data_source = DataSource.live
     return AdapterResult(
         portal=portal,
-        status=AdapterStatus.ok if items else AdapterStatus.partial,
-        items=items,
+        status=AdapterStatus.ok if filtered else AdapterStatus.partial,
+        items=filtered,
         unsupported_filters=unsupported,
-        pagination=pagination,
+        pagination=AdapterPaginationMeta(
+            pages_fetched=pages_fetched if filtered else 0,
+            listings_raw=len(items),
+            listings_after_filter=len(filtered),
+            max_pages=max_pages,
+            page_size_hint=page_size,
+            mode="live",
+            data_source_hint=DataSource.live.value if filtered else None,
+        ),
         error=None,
     )

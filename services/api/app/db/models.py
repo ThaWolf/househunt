@@ -67,6 +67,7 @@ class Property(Base):
     portal: Mapped[str] = mapped_column(String(32), nullable=False, index=True)
     external_id: Mapped[str] = mapped_column(String(128), nullable=False)
     source_url: Mapped[str] = mapped_column(Text, nullable=False)
+    data_source: Mapped[str] = mapped_column(String(32), nullable=False, default="live")
     title: Mapped[str] = mapped_column(String(512), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     operation: Mapped[str] = mapped_column(String(16), nullable=False, default="buy")

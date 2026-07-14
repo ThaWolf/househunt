@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 
 from app.adapters.types import RawProperty
-from app.schemas.common import Operation, PortalId, PropertyType
+from app.schemas.common import DataSource, Operation, PortalId, PropertyType
 
 
 FIXTURES_PATH = Path(__file__).with_name("sample_listings.json")
@@ -27,6 +27,11 @@ def load_fixture_properties(portal: PortalId) -> list[RawProperty]:
     rows = _raw_data().get(portal.value, [])
     out: list[RawProperty] = []
     for row in rows:
+        ds_raw = row.get("dataSource") or "fixture_curated"
+        try:
+            data_source = DataSource(ds_raw)
+        except ValueError:
+            data_source = DataSource.fixture_curated
         out.append(
             RawProperty(
                 portal=portal,
@@ -53,7 +58,8 @@ def load_fixture_properties(portal: PortalId) -> list[RawProperty]:
                 images=row.get("images") or [],
                 agent_name=row.get("agentName"),
                 agent_phone=row.get("agentPhone"),
-                raw_hints={"source": "fixture"},
+                data_source=data_source,
+                raw_hints={"source": "fixture", "dataSource": data_source.value},
             )
         )
     return out

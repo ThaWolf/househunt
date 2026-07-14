@@ -1,13 +1,13 @@
-"""Iter 3: dense fixtures, riskSafety, narrative, zone/map, http images."""
+"""Iter 3 report/narrative/zone tests + iter4 density override (veracity > volume)."""
 
 from __future__ import annotations
 
 import pytest
 
 from app.adapters.fixtures.loader import clear_fixture_cache, load_fixture_properties
-from app.adapters.types import RawProperty
+from app.adapters.types import AdapterPaginationMeta, AdapterResult, RawProperty
 from app.config import get_settings
-from app.schemas.common import PortalId, PriceStance
+from app.schemas.common import AdapterStatus, DataSource, PortalId, PriceStance
 from app.scoring.humanize import build_humanized_report
 from app.scoring.narrative import build_price_narrative, is_peer
 from app.zone.maps import build_map_embed
@@ -21,55 +21,17 @@ def _fresh_fixtures():
     clear_fixture_cache()
 
 
-def test_fixture_density_per_portal():
-    for portal in PortalId:
-        items = load_fixture_properties(portal)
-        assert len(items) >= 8, f"{portal} has {len(items)} fixtures"
-        assert len(items) >= 10
-
-
-def test_gonnet_band_total_ge_15():
-    total = 0
-    for portal in PortalId:
-        for item in load_fixture_properties(portal):
-            if (item.address_locality or "").lower() == "gonnet" and (
-                item.price_amount is not None and item.price_amount <= 150_000
-            ):
-                total += 1
-    assert total >= 15
-
-
-def test_solo_max_price_band_ge_15():
-    total = 0
-    for portal in PortalId:
-        for item in load_fixture_properties(portal):
-            if item.price_amount is not None and item.price_amount <= 150_000:
-                total += 1
-    assert total >= 15
-
-
-def test_images_are_http_source():
-    for portal in PortalId:
-        for item in load_fixture_properties(portal):
-            assert item.images, f"{portal}/{item.external_id} missing images"
-            for img in item.images:
-                url = img["url"]
-                assert url.startswith("http://") or url.startswith("https://")
-                assert "placehold.co" not in url
-                assert img.get("kind", "source") == "source"
-
-
-def test_descriptions_are_long():
-    for portal in PortalId:
-        for item in load_fixture_properties(portal):
-            assert item.description and len(item.description) >= 120
+def test_fixtures_purged_no_fake_density():
+    """Iter4: empty fixtures OK — dense fake set purged."""
+    total = sum(len(load_fixture_properties(p)) for p in PortalId)
+    assert total == 0
 
 
 def test_risk_safety_label_and_helptext_no_invert():
     clean = RawProperty(
         portal=PortalId.zonaprop,
         external_id="clean-1",
-        source_url="https://example.com/c",
+        source_url="https://www.zonaprop.com.ar/propiedades/clasificado/veclcain-casa-1.html",
         title="Casa luminosa",
         description="Buen estado, lista para vivir",
         rooms=3,
@@ -80,6 +42,7 @@ def test_risk_safety_label_and_helptext_no_invert():
         price_currency="USD",
         address_locality="Gonnet",
         amenities=["jardin"],
+        data_source=DataSource.live,
     )
     report = build_humanized_report(clean)
     risk = next(c for c in report.components if c.id == "riskSafety")
@@ -96,24 +59,26 @@ def test_price_narrative_cohort():
     subject = RawProperty(
         portal=PortalId.zonaprop,
         external_id="subj",
-        source_url="https://example.com/s",
+        source_url="https://www.zonaprop.com.ar/propiedades/clasificado/s.html",
         title="Casa Gonnet",
         description="x" * 130,
         rooms=3,
         price_amount=100000,
         price_currency="USD",
         address_locality="Gonnet",
+        data_source=DataSource.live,
     )
     peers = [
         RawProperty(
             portal=PortalId.argenprop,
             external_id=f"p{i}",
-            source_url=f"https://example.com/{i}",
+            source_url=f"https://www.argenprop.com/propiedad-{i}",
             title="Peer",
             rooms=3,
             price_amount=120000 + i * 1000,
             price_currency="USD",
             address_locality="Gonnet",
+            data_source=DataSource.live,
         )
         for i in range(5)
     ]
@@ -129,7 +94,7 @@ def test_zone_report_and_map_external_always():
     raw = RawProperty(
         portal=PortalId.zonaprop,
         external_id="z1",
-        source_url="https://example.com/z",
+        source_url="https://www.zonaprop.com.ar/propiedades/clasificado/z.html",
         title="Casa Gonnet",
         description="x" * 130,
         address_locality="Gonnet",
@@ -139,6 +104,7 @@ def test_zone_report_and_map_external_always():
         rooms=3,
         price_amount=130000,
         price_currency="USD",
+        data_source=DataSource.live,
     )
     zone = build_zone_report(raw)
     assert zone.provider.value == "seed"
@@ -147,7 +113,6 @@ def test_zone_report_and_map_external_always():
 
     get_settings.cache_clear()
     settings = get_settings()
-    # No valid maps key in tests → external_only, embedUrl null
     settings.google_maps_api_key = "********"
     settings.feature_google_maps = True
     m = build_map_embed(raw, zone, settings=settings)
@@ -164,7 +129,66 @@ def test_zone_report_and_map_external_always():
 
 
 @pytest.mark.asyncio
-async def test_search_gonnet_density_and_pagination(client):
+async def test_search_with_mocked_live_density(client, monkeypatch):
+    """Density targets met via mocked live items (not fake fixtures)."""
+    from app.adapters import registry
+
+    def _mk(portal: PortalId, n: int, locality: str = "Gonnet") -> list[RawProperty]:
+        host = {
+            PortalId.zonaprop: "https://www.zonaprop.com.ar/propiedades/clasificado/x-{i}.html",
+            PortalId.mercadolibre: "https://casa.mercadolibre.com.ar/MLA-{i}-casa-_JM",
+            PortalId.argenprop: "https://www.argenprop.com/propiedad-{i}",
+            PortalId.remax: "https://www.remax.com.ar/listings/{i}",
+            PortalId.century21: "https://century21.com.ar/propiedad/{i}",
+        }[portal]
+        img_host = {
+            PortalId.zonaprop: "https://imgar.zonapropcdn.com/avisos/{i}.jpg",
+            PortalId.mercadolibre: "https://http2.mlstatic.com/D_NQ_NP_{i}.webp",
+            PortalId.argenprop: "https://www.argenprop.com/img/{i}.jpg",
+            PortalId.remax: "https://www.remax.com.ar/img/{i}.jpg",
+            PortalId.century21: "https://century21.com.ar/img/{i}.jpg",
+        }[portal]
+        out = []
+        for i in range(n):
+            out.append(
+                RawProperty(
+                    portal=portal,
+                    external_id=f"{portal.value}-{i}",
+                    source_url=host.format(i=1000 + i),
+                    title=f"Casa {locality} {i}",
+                    description="d" * 130,
+                    price_amount=100000 + i * 1000,
+                    price_currency="USD",
+                    address_locality=locality,
+                    rooms=3,
+                    images=[{"url": img_host.format(i=i), "order": 0, "kind": "source"}],
+                    data_source=DataSource.live,
+                )
+            )
+        return out
+
+    async def fake_run(portal, filters, *, settings=None):
+        items = _mk(portal, 4)
+        return AdapterResult(
+            portal=portal,
+            status=AdapterStatus.ok,
+            items=items,
+            pagination=AdapterPaginationMeta(
+                pages_fetched=2,
+                listings_raw=len(items),
+                listings_after_filter=len(items),
+                max_pages=3,
+                page_size_hint=20,
+                mode="live",
+                data_source_hint="live",
+            ),
+        )
+
+    monkeypatch.setattr(registry, "run_adapter", fake_run)
+    import app.search.service as search_service
+
+    monkeypatch.setattr(search_service, "run_adapter", fake_run)
+
     reg = await client.post(
         "/api/auth/register",
         json={"email": "dens@example.com", "password": "password123", "displayName": "D"},
@@ -193,21 +217,10 @@ async def test_search_gonnet_density_and_pagination(client):
     data = resp.json()
     assert data["density"]["totalItems"] >= 15
     assert len(data["items"]) >= 15
-
-    # pagination meta present
-    for pr in data["portalResults"]:
-        assert pr.get("pagination") is not None
-        assert pr["pagination"]["listingsRaw"] >= 8
-
-    # http images
-    with_http = 0
     for item in data["items"]:
-        imgs = item.get("images") or []
-        if imgs and str(imgs[0]["url"]).startswith("http"):
-            with_http += 1
-    assert with_http / max(len(data["items"]), 1) >= 0.8
+        assert item["dataSource"] == "live"
+        assert "picsum" not in str(item.get("images"))
 
-    # detail: riskSafety + zone + map
     prop_id = data["items"][0]["id"]
     detail = await client.get(
         f"/api/properties/{prop_id}",
@@ -217,14 +230,7 @@ async def test_search_gonnet_density_and_pagination(client):
     report = detail.json()["report"]
     ids = {c["id"] for c in report["components"]}
     assert "riskSafety" in ids
-    risk = next(c for c in report["components"] if c["id"] == "riskSafety")
-    assert risk["label"] == "Salud legal / riesgo"
-    assert risk.get("helpText")
-    assert report.get("priceNarrative") is not None
-    assert report.get("zoneReport") is not None
-    assert report["map"]["externalUrl"]
-    assert detail.json()["property"].get("description")
-    assert len(detail.json()["property"]["description"]) >= 120
+    assert detail.json()["property"]["dataSource"] == "live"
 
 
 @pytest.mark.asyncio

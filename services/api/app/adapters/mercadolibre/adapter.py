@@ -1,12 +1,47 @@
-from app.adapters.common import fetch_with_fixtures
+from __future__ import annotations
+
+from app.adapters.browser import BrowserFetchError
+from app.adapters.common import empty_result, fetch_with_fixtures, live_ok_result
+from app.adapters.mercadolibre.live import fetch_mercadolibre_live
 from app.adapters.types import AdapterResult
-from app.schemas.common import PortalId
+from app.config import get_settings
+from app.schemas.common import AdapterErrorCode, AdapterStatus, PortalId
 from app.schemas.property import SearchFilters
+
+
+def _error_code(raw: str) -> AdapterErrorCode:
+    try:
+        return AdapterErrorCode(raw)
+    except ValueError:
+        return AdapterErrorCode.network
 
 
 class MercadoLibreAdapter:
     portal = PortalId.mercadolibre
-    analysis_status = "needs_probe"
+    analysis_status = "ready"
 
     async def fetch(self, filters: SearchFilters) -> AdapterResult:
-        return await fetch_with_fixtures(self.portal, filters, analysis_status=self.analysis_status)
+        settings = get_settings()
+        if settings.adapter_use_fixtures:
+            return await fetch_with_fixtures(
+                self.portal, filters, analysis_status=self.analysis_status
+            )
+        try:
+            items = await fetch_mercadolibre_live(filters, settings=settings)
+            return live_ok_result(self.portal, filters, items, settings=settings)
+        except BrowserFetchError as exc:
+            code = _error_code(exc.code)
+            status = (
+                AdapterStatus.partial
+                if code in (AdapterErrorCode.bot_wall, AdapterErrorCode.rate_limit)
+                else AdapterStatus.error
+            )
+            return empty_result(
+                self.portal,
+                filters,
+                settings=settings,
+                code=code,
+                message=exc.message,
+                status=status,
+                mode="live",
+            )

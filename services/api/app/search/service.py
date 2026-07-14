@@ -91,6 +91,17 @@ def _pagination_dto(res: AdapterResult) -> AdapterPaginationMetaDTO | None:
             mode = SearchModeHint(p.mode)
         except ValueError:
             mode = None
+    hint = None
+    if p.data_source_hint:
+        if p.data_source_hint == "mixed":
+            hint = "mixed"
+        else:
+            try:
+                from app.schemas.common import DataSource
+
+                hint = DataSource(p.data_source_hint)
+            except ValueError:
+                hint = None
     return AdapterPaginationMetaDTO(
         pages_fetched=p.pages_fetched,
         listings_raw=p.listings_raw,
@@ -98,6 +109,7 @@ def _pagination_dto(res: AdapterResult) -> AdapterPaginationMetaDTO | None:
         max_pages=p.max_pages,
         page_size_hint=p.page_size_hint,
         mode=mode,
+        data_source_hint=hint,
     )
 
 
@@ -247,7 +259,16 @@ async def run_search(
     elif "live" in modes:
         dens_mode = SearchModeHint.live
     else:
-        dens_mode = SearchModeHint.hybrid
+        dens_mode = SearchModeHint.live
+
+    sources = {getattr(r, "data_source", None) or "live" for r in filtered_rows}
+    if not sources:
+        dens_hint = None
+    elif len(sources) == 1:
+        only = next(iter(sources))
+        dens_hint = only if only in ("live", "fixture_curated", "demo_stub") else "mixed"
+    else:
+        dens_hint = "mixed"
 
     took_ms = int((time.perf_counter() - started) * 1000)
     return SearchResponse(
@@ -259,6 +280,7 @@ async def run_search(
             total_items=len(items),
             portals_with_multi_page=multi_page,
             mode=dens_mode,
+            data_source_hint=dens_hint,
         ),
         took_ms=took_ms,
     )

@@ -11,6 +11,7 @@ from app.schemas.common import (
     Agent,
     Area,
     Currency,
+    DataSource,
     GeoPoint,
     ImageKind,
     ImageRef,
@@ -26,6 +27,7 @@ from app.schemas.common import (
 )
 from app.schemas.property import PropertyDTO
 from app.adapters.types import RawProperty
+from app.adapters.veracity import normalize_data_source
 
 
 def _dt(value: datetime | None) -> datetime | None:
@@ -76,11 +78,14 @@ def property_to_dto(row: models.Property) -> PropertyDTO:
             period=None,
         )
 
+    data_source = normalize_data_source(getattr(row, "data_source", None) or "live")
+
     return PropertyDTO(
         id=row.id,
         portal=PortalId(row.portal),
         external_id=row.external_id,
         source_url=row.source_url,
+        data_source=data_source,
         title=row.title,
         description=row.description,
         description_excerpt=_excerpt(row.description),
@@ -116,11 +121,13 @@ def raw_property_to_model(
     score_breakdown: dict | None = None,
 ) -> models.Property:
     scraped = raw.scraped_at or datetime.now(timezone.utc)
+    data_source = normalize_data_source(raw.data_source)
     return models.Property(
         id=property_id or uuid4(),
         portal=raw.portal.value if hasattr(raw.portal, "value") else str(raw.portal),
         external_id=raw.external_id,
         source_url=raw.source_url,
+        data_source=data_source.value,
         title=raw.title,
         description=raw.description,
         operation=raw.operation.value if hasattr(raw.operation, "value") else raw.operation,
@@ -160,6 +167,7 @@ def apply_raw_to_row(
     score_breakdown: dict | None,
 ) -> None:
     row.source_url = raw.source_url
+    row.data_source = normalize_data_source(raw.data_source).value
     row.title = raw.title
     row.description = raw.description
     row.operation = raw.operation.value if hasattr(raw.operation, "value") else raw.operation

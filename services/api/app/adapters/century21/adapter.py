@@ -1,4 +1,4 @@
-"""Century 21 adapter — prefer Hydra/API entrypoint; fixture fallback."""
+"""Century 21 adapter — Hydra/API best-effort; never invent listings."""
 
 from __future__ import annotations
 
@@ -6,13 +6,13 @@ import logging
 
 import httpx
 
-from app.adapters.common import filter_raw_items, fetch_with_fixtures
-from app.adapters.fixtures.loader import load_fixture_properties
-from app.adapters.types import AdapterError, AdapterResult, RawProperty
+from app.adapters.common import empty_result, fetch_with_fixtures, filter_raw_items, live_ok_result
+from app.adapters.types import RawProperty
 from app.config import get_settings
 from app.schemas.common import (
     AdapterErrorCode,
     AdapterStatus,
+    DataSource,
     Operation,
     PortalId,
     PropertyType,
@@ -30,35 +30,48 @@ class Century21Adapter:
     portal = PortalId.century21
     analysis_status = "ready"
 
-    async def fetch(self, filters: SearchFilters) -> AdapterResult:
+    async def fetch(self, filters: SearchFilters):
         settings = get_settings()
         if settings.adapter_use_fixtures:
             return await fetch_with_fixtures(
                 self.portal, filters, analysis_status=self.analysis_status
             )
 
-        # Attempt real Hydra/API discovery + listings; degrade gracefully
         try:
             async with httpx.AsyncClient(
-                timeout=settings.adapter_timeout_seconds,
+                timeout=min(settings.adapter_timeout_seconds, 15.0),
                 follow_redirects=True,
                 headers={
                     "User-Agent": (
-                        "Mozilla/5.0 (compatible; HousehuntMVP/0.1; +https://github.com/ThaWolf/househunt)"
+                        "Mozilla/5.0 (compatible; HousehuntMVP/0.4; +https://github.com/ThaWolf/househunt)"
                     ),
                     "Accept": "application/ld+json, application/json",
                 },
             ) as client:
                 docs = await client.get(C21_API_DOCS)
+                if docs.status_code == 403:
+                    return empty_result(
+                        self.portal,
+                        filters,
+                        settings=settings,
+                        code=AdapterErrorCode.bot_wall,
+                        message="Century21 API bot wall; omitting results",
+                        status=AdapterStatus.partial,
+                    )
                 if docs.status_code >= 400:
-                    raise RuntimeError(f"docs status {docs.status_code}")
+                    return empty_result(
+                        self.portal,
+                        filters,
+                        settings=settings,
+                        code=AdapterErrorCode.network,
+                        message=f"C21 docs status {docs.status_code}; omitting results",
+                    )
 
-                # Hydra entrypoints vary; try common collection paths
                 candidates = [
                     f"{C21_API_BASE}/propiedades",
                     f"{C21_API_BASE}/properties",
                     f"{C21_API_BASE}/inmuebles",
-                    f"{C21_SEARCH_UI}",
+                    C21_SEARCH_UI,
                 ]
                 parsed: list[RawProperty] = []
                 last_error: str | None = None
@@ -72,40 +85,26 @@ class Century21Adapter:
                         break
 
                 if parsed:
-                    return AdapterResult(
-                        portal=self.portal,
-                        status=AdapterStatus.ok,
-                        items=filter_raw_items(parsed, filters),
-                        unsupported_filters=[],
-                        error=None,
+                    return live_ok_result(
+                        self.portal, filters, filter_raw_items(parsed, filters), settings=settings
                     )
 
-                # API reachable but schema unknown → fixtures + partial
-                items = filter_raw_items(load_fixture_properties(self.portal), filters)
-                return AdapterResult(
-                    portal=self.portal,
+                return empty_result(
+                    self.portal,
+                    filters,
+                    settings=settings,
+                    code=AdapterErrorCode.parse,
+                    message=last_error or "C21 API reachable; listing schema not mapped",
                     status=AdapterStatus.partial,
-                    items=items,
-                    unsupported_filters=[],
-                    error=AdapterError(
-                        code=AdapterErrorCode.parse,
-                        message=last_error or "C21 API reachable; listing schema not mapped yet",
-                        retryable=True,
-                    ),
                 )
-        except Exception as exc:  # noqa: BLE001 — never crash search
+        except Exception as exc:  # noqa: BLE001
             logger.warning("century21 fetch failed: %s", type(exc).__name__)
-            items = filter_raw_items(load_fixture_properties(self.portal), filters)
-            return AdapterResult(
-                portal=self.portal,
-                status=AdapterStatus.partial if items else AdapterStatus.error,
-                items=items,
-                unsupported_filters=[],
-                error=AdapterError(
-                    code=AdapterErrorCode.network,
-                    message="Century21 live fetch failed; returning fixtures",
-                    retryable=True,
-                ),
+            return empty_result(
+                self.portal,
+                filters,
+                settings=settings,
+                code=AdapterErrorCode.network,
+                message="Century21 live fetch failed; omitting results",
             )
 
     def _parse_payload(self, resp: httpx.Response) -> list[RawProperty]:
@@ -117,7 +116,7 @@ class Century21Adapter:
         except Exception:
             return []
 
-        members = []
+        members: list = []
         if isinstance(data, list):
             members = data
         elif isinstance(data, dict):
@@ -142,8 +141,11 @@ class Century21Adapter:
                 row.get("url")
                 or row.get("permalink")
                 or row.get("sourceUrl")
-                or f"https://century21.com.ar/propiedad/{ext}"
+                or ""
             )
+            if not url or "century21.com.ar" not in url:
+                # No invent: skip rows without real portal URL
+                continue
             price = row.get("precio") or row.get("price") or row.get("priceAmount")
             amount = None
             if isinstance(price, (int, float)):
@@ -165,6 +167,7 @@ class Century21Adapter:
                     address_raw=row.get("direccion") or row.get("address"),
                     rooms=row.get("ambientes") or row.get("rooms"),
                     bathrooms=row.get("banos") or row.get("bathrooms"),
+                    data_source=DataSource.live,
                     raw_hints={"source": "century21_live"},
                 )
             )

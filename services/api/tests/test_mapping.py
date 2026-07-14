@@ -29,7 +29,7 @@ def test_raw_property_to_model_and_dto():
         area_covered_m2=150,
         area_total_m2=300,
         amenities=["jardin"],
-        images=[{"url": "https://placehold.co/1.png", "order": 0}],
+        images=[{"url": "https://imgar.zonapropcdn.com/avisos/1.jpg", "order": 0, "kind": "source"}],
         scraped_at=datetime.now(timezone.utc),
     )
     row = raw_property_to_model(raw, property_id=uuid4(), app_score=72, score_breakdown={"attrs": 80})
@@ -38,10 +38,13 @@ def test_raw_property_to_model_and_dto():
     assert row.external_id == "zp-map-1"
     assert row.price_amount == 200000
     assert row.amenities == ["jardin"]
+    assert row.data_source == "live"
 
     dto = property_to_dto(row)
     dumped = dto.model_dump(by_alias=True)
     assert dumped["externalId"] == "zp-map-1"
     assert dumped["sourceUrl"].startswith("https://")
+    assert dumped["dataSource"] == "live"
     assert dumped["area"]["coveredM2"] == 150
     assert dumped["appScore"] == 72
+    assert dumped["images"][0]["kind"] == "source"

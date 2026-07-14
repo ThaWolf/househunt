@@ -9,6 +9,7 @@ from typing import Any
 from app.schemas.common import (
     AdapterErrorCode,
     AdapterStatus,
+    DataSource,
     Operation,
     PortalId,
     PropertyType,
@@ -53,6 +54,7 @@ class RawProperty:
     agent_phone: str | None = None
     listed_at: datetime | None = None
     scraped_at: datetime | None = None
+    data_source: DataSource = DataSource.live
     raw_hints: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
@@ -68,6 +70,7 @@ class AdapterPaginationMeta:
     max_pages: int = 3
     page_size_hint: int = 20
     mode: str | None = None  # fixtures | live | hybrid
+    data_source_hint: str | None = None  # live | fixture_curated | demo_stub | mixed
 
 
 @dataclass

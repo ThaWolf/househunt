@@ -169,10 +169,16 @@ class ImageKind(str, Enum):
     placeholder = "placeholder"
 
 
+class DataSource(str, Enum):
+    live = "live"
+    fixture_curated = "fixture_curated"
+    demo_stub = "demo_stub"
+
+
 class ImageRef(CamelModel):
     url: str
     order: int
-    kind: ImageKind = ImageKind.source
+    kind: ImageKind  # E19 — required; no silent default to source
 
 
 class Agent(CamelModel):
