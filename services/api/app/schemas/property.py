@@ -10,11 +10,15 @@ from pydantic import Field, model_validator
 
 from app.schemas.common import (
     Address,
+    AdapterErrorCode,
+    AdapterMaturity,
+    AdapterStatus,
     Agent,
     Area,
     CamelModel,
     Currency,
     DataSource,
+    EmptyStateKind,
     GeoMode,
     GeoPoint,
     GeocodeSource,
@@ -30,8 +34,6 @@ from app.schemas.common import (
     PropertyType,
     ScoreBreakdown,
     SearchModeHint,
-    AdapterErrorCode,
-    AdapterStatus,
     ZonePlaceSource,
     ZoneProvider,
 )
@@ -145,12 +147,25 @@ class AdapterPaginationMetaDTO(CamelModel):
     data_source_hint: DataSource | Literal["mixed"] | None = None
 
 
+class PortalDiagnostics(CamelModel):
+    raw_count: int = 0
+    after_filter_count: int = 0
+    rooms_dropped: int = 0
+    rooms_filter_wiped: bool = False
+    maturity: AdapterMaturity = AdapterMaturity.live_partial
+    drop_reasons: list[
+        Literal["rooms_null", "rooms_below_min", "geo", "price", "other"]
+    ] = Field(default_factory=list)
+
+
 class PortalSearchResult(CamelModel):
     portal: PortalId
     status: AdapterStatus
     count: int = 0
     unsupported_filters: list[str] = Field(default_factory=list)
     pagination: AdapterPaginationMetaDTO | None = None
+    diagnostics: PortalDiagnostics | None = None
+    maturity: AdapterMaturity | None = None
     error: PortalSearchError | None = None
 
 
@@ -159,6 +174,33 @@ class SearchDensity(CamelModel):
     portals_with_multi_page: int = 0
     mode: SearchModeHint = SearchModeHint.hybrid
     data_source_hint: DataSource | Literal["mixed"] | None = None
+
+
+class EmptyStateHint(CamelModel):
+    kind: EmptyStateKind
+    title: str
+    body: str
+    hint: str | None = None
+
+
+class PortalDiagnosticsSlice(CamelModel):
+    portal: PortalId
+    raw_count: int = 0
+    after_filter_count: int = 0
+    rooms_dropped: int = 0
+    rooms_filter_wiped: bool = False
+    maturity: AdapterMaturity = AdapterMaturity.live_partial
+    status: AdapterStatus
+    error_code: AdapterErrorCode | None = None
+
+
+class SearchDiagnostics(CamelModel):
+    raw_count: int = 0
+    after_filter_count: int = 0
+    rooms_dropped: int = 0
+    rooms_filter_wiped: bool = False
+    portals: list[PortalDiagnosticsSlice] = Field(default_factory=list)
+    empty_state: EmptyStateHint | None = None
 
 
 class SearchResultItem(PropertyDTO):
@@ -170,6 +212,7 @@ class SearchResponse(CamelModel):
     filters: SearchFilters
     items: list[SearchResultItem]
     portal_results: list[PortalSearchResult]
+    diagnostics: SearchDiagnostics
     density: SearchDensity | None = None
     took_ms: int
 

@@ -8,6 +8,14 @@ from app.schemas.interest import AdaptersMetaResponse, PortalMeta
 
 router = APIRouter(tags=["meta"])
 
+_DEFAULT_MATURITY = {
+    "zonaprop": "live_partial",
+    "mercadolibre": "live_partial",
+    "argenprop": "live_ok",
+    "remax": "live_ok",
+    "century21": "live_ok",
+}
+
 
 @router.get("/health")
 async def health() -> dict:
@@ -21,13 +29,16 @@ async def adapters_meta(user: User = Depends(get_current_user)) -> AdaptersMetaR
     settings = get_settings()
     portals = []
     for portal, adapter in all_adapters().items():
+        analysis = getattr(adapter, "analysis_status", settings.analysis_status(portal.value))
+        maturity = getattr(adapter, "maturity", None) or _DEFAULT_MATURITY.get(
+            portal.value, "live_partial"
+        )
         portals.append(
             PortalMeta(
                 id=portal.value,
                 enabled=settings.adapter_enabled(portal.value),
-                analysis_status=getattr(
-                    adapter, "analysis_status", settings.analysis_status(portal.value)
-                ),
+                analysis_status=analysis,
+                maturity=maturity,
                 hybrid_default=settings.adapter_hybrid_default,
             )
         )

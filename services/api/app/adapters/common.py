@@ -156,6 +156,53 @@ def curated_fixture_slice(
 dense_fixture_slice = curated_fixture_slice
 
 
+def _count_rooms_drops(
+    items: list[RawProperty], filters: SearchFilters
+) -> tuple[int, list[str]]:
+    """Count items that fail solely on rooms.min (null or below)."""
+    if filters.rooms is None or filters.rooms.min is None:
+        return 0, []
+    min_rooms = filters.rooms.min
+    dropped = 0
+    reasons: list[str] = []
+    for item in items:
+        if item.rooms is None:
+            dropped += 1
+            if "rooms_null" not in reasons:
+                reasons.append("rooms_null")
+        elif item.rooms < min_rooms:
+            dropped += 1
+            if "rooms_below_min" not in reasons:
+                reasons.append("rooms_below_min")
+    return dropped, reasons
+
+
+def _maturity_for(
+    portal: PortalId,
+    *,
+    status: AdapterStatus,
+    filtered: list[RawProperty],
+    error: AdapterError | None,
+) -> str:
+    from app.schemas.common import AdapterMaturity
+
+    if error and error.code == AdapterErrorCode.not_implemented:
+        return AdapterMaturity.not_implemented.value
+    if error and error.code == AdapterErrorCode.auth_required:
+        return AdapterMaturity.broken.value
+    if filtered:
+        return AdapterMaturity.live_ok.value
+    if status == AdapterStatus.skipped:
+        return AdapterMaturity.not_implemented.value
+    if status == AdapterStatus.error and error and error.code in (
+        AdapterErrorCode.bot_wall,
+        AdapterErrorCode.network,
+        AdapterErrorCode.parse,
+    ):
+        return AdapterMaturity.live_partial.value
+    return AdapterMaturity.live_partial.value
+
+
 def empty_result(
     portal: PortalId,
     filters: SearchFilters,
@@ -166,9 +213,12 @@ def empty_result(
     status: AdapterStatus = AdapterStatus.error,
     retryable: bool = True,
     mode: str = "live",
+    maturity: str | None = None,
 ) -> AdapterResult:
     max_pages, page_size = _pagination_knobs(filters, settings)
     unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
+    err = AdapterError(code=code, message=message, retryable=retryable)
+    mat = maturity or _maturity_for(portal, status=status, filtered=[], error=err)
     return AdapterResult(
         portal=portal,
         status=status,
@@ -183,7 +233,11 @@ def empty_result(
             mode=mode,
             data_source_hint=None,
         ),
-        error=AdapterError(code=code, message=message, retryable=retryable),
+        error=err,
+        raw_count=0,
+        rooms_dropped=0,
+        rooms_filter_wiped=False,
+        maturity=mat,
     )
 
 
@@ -224,6 +278,10 @@ async def fetch_with_fixtures(
                 ),
                 retryable=True,
             ),
+            raw_count=pagination.listings_raw,
+            rooms_dropped=0,
+            rooms_filter_wiped=False,
+            maturity="live_partial",
         )
 
     # Live preferred but no scraper for this portal → skip inventing
@@ -256,6 +314,7 @@ async def fetch_with_fixtures(
         status=AdapterStatus.skipped,
         retryable=False,
         mode="live",
+        maturity="not_implemented",
     )
 
 
@@ -269,16 +328,39 @@ def live_ok_result(
 ) -> AdapterResult:
     max_pages, page_size = _pagination_knobs(filters, settings)
     unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
+    rooms_dropped, drop_reasons = _count_rooms_drops(items, filters)
     filtered = filter_raw_items(items, filters)
     for item in filtered:
         item.data_source = DataSource.live
+
+    rooms_min_set = filters.rooms is not None and filters.rooms.min is not None
+    rooms_wipe = (
+        rooms_min_set
+        and len(items) > 0
+        and len(filtered) == 0
+        and rooms_dropped == len(items)
+    )
+
+    error = None
+    if rooms_wipe:
+        error = AdapterError(
+            code=AdapterErrorCode.filtered_rooms_null,
+            message=(
+                f"{portal.value}: scraped {len(items)} listings but rooms.min "
+                f"filter dropped all (null or below min)"
+            ),
+            retryable=False,
+        )
+
+    status = AdapterStatus.ok if filtered else AdapterStatus.partial
+    mat = _maturity_for(portal, status=status, filtered=filtered, error=error)
     return AdapterResult(
         portal=portal,
-        status=AdapterStatus.ok if filtered else AdapterStatus.partial,
+        status=status,
         items=filtered,
         unsupported_filters=unsupported,
         pagination=AdapterPaginationMeta(
-            pages_fetched=pages_fetched if filtered else 0,
+            pages_fetched=pages_fetched if items else 0,
             listings_raw=len(items),
             listings_after_filter=len(filtered),
             max_pages=max_pages,
@@ -286,5 +368,10 @@ def live_ok_result(
             mode="live",
             data_source_hint=DataSource.live.value if filtered else None,
         ),
-        error=None,
+        error=error,
+        raw_count=len(items),
+        rooms_dropped=rooms_dropped,
+        rooms_filter_wiped=rooms_wipe,
+        maturity=mat,
+        drop_reasons=drop_reasons,
     )

@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
+from app.adapters.rooms_parse import parse_rooms, rooms_min_from_filters
 from app.adapters.types import RawProperty
 from app.adapters.veracity import HOUSEHUNT_PLACEHOLDER_URL, image_host_ok_for_portal
 from app.config import Settings, get_settings
@@ -33,6 +34,10 @@ def build_search_url(filters: SearchFilters) -> str:
     elif filters.geo and filters.geo.locality:
         key = filters.geo.locality.strip().lower()
         slug = _LOCALITY_SLUGS.get(key, re.sub(r"[^a-z0-9]+", "-", key).strip("-") or "la-plata")
+    rooms_min = rooms_min_from_filters(filters)
+    # Navent pattern observed in market URLs (probe pending exact CF confirm)
+    if rooms_min and rooms_min >= 1:
+        return f"https://www.zonaprop.com.ar/casas-venta-{slug}-mas-de-{rooms_min}-ambientes.html"
     return f"https://www.zonaprop.com.ar/casas-venta-{slug}.html"
 
 
@@ -103,14 +108,21 @@ EXTRACT_JS = """
     const locEl = card && card.querySelector(
       '[data-qa="POSTING_CARD_LOCATION"], .postingCardLocation, .PostingCard-location'
     );
+    const featsEl = card && card.querySelector(
+      '[data-qa="POSTING_CARD_FEATURES"], .postingCardFeatures, .PostingCard-features, ul'
+    );
     const idMatch = href.match(/(\\d{6,})\\.html/);
     const titleText = (titleEl && titleEl.textContent || '').trim();
+    const featsText = (featsEl && featsEl.textContent || '').trim();
+    const cardText = (card && card.innerText || '').slice(0, 600);
     out.push({
       href,
       title: titleText,
       img: img && (img.getAttribute('src') || img.getAttribute('data-src')),
       price: priceEl && priceEl.textContent.trim(),
       loc: locEl && locEl.textContent.trim(),
+      feats: featsText,
+      cardText,
       id: idMatch && idMatch[1],
     });
     if (out.length >= 40) break;
@@ -129,9 +141,20 @@ async def scrape_zonaprop(
     settings = settings or get_settings()
     url = build_search_url(filters)
     timeout_ms = int(max(settings.adapter_timeout_seconds, 20) * 1000)
+    rooms_min = rooms_min_from_filters(filters)
 
     async with browser_page(timeout_ms=timeout_ms) as page:
-        await goto_html(page, url, wait_bot_clear_seconds=14.0)
+        try:
+            await goto_html(page, url, wait_bot_clear_seconds=14.0)
+        except BrowserFetchError as exc:
+            # Room-path slug may 404/CF; fall back to base locality URL
+            if rooms_min and "mas-de" in url:
+                fallback = re.sub(r"-mas-de-\d+-ambientes", "", url)
+                logger.info("zonaprop rooms URL failed (%s); retry %s", exc.code, fallback)
+                await goto_html(page, fallback, wait_bot_clear_seconds=14.0)
+                url = fallback
+            else:
+                raise
         rows = await page.evaluate(EXTRACT_JS)
 
     items: list[RawProperty] = []
@@ -148,10 +171,18 @@ async def scrape_zonaprop(
             title = _title_from_url(href)
         amount, currency = _parse_price(row.get("price"))
         locality, neighborhood = _guess_locality(row.get("loc"), filters)
+        rooms = parse_rooms(
+            row.get("feats"),
+            row.get("cardText"),
+            title,
+            href,
+        )
+        # If portal rooms URL was applied and card lacks rooms, inherit min as lower bound hint
+        if rooms is None and rooms_min is not None and "mas-de" in url:
+            rooms = rooms_min
         img_url = row.get("img")
         images: list[dict] = []
         if img_url and image_host_ok_for_portal(PortalId.zonaprop, img_url):
-            # Prefer larger CDN size when thumbnail pattern known
             bigger = re.sub(r"/\d+x\d+/", "/720x532/", img_url)
             images.append({"url": bigger, "order": 0, "kind": "source"})
         else:
@@ -172,6 +203,7 @@ async def scrape_zonaprop(
                 address_province="Buenos Aires",
                 address_locality=locality,
                 address_neighborhood=neighborhood,
+                rooms=rooms,
                 images=images,
                 data_source=DataSource.live,
                 raw_hints={"source": "zonaprop_live", "searchUrl": url},

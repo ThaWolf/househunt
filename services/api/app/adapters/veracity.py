@@ -47,8 +47,9 @@ PORTAL_IMAGE_HOST_SUFFIXES: dict[PortalId, tuple[str, ...]] = {
     PortalId.zonaprop: ("zonapropcdn.com", "zonaprop.com.ar", "naventcdn.com"),
     PortalId.argenprop: ("argenprop.com",),
     PortalId.mercadolibre: ("mlstatic.com", "mercadolibre.com", "mercadolibre.com.ar"),
-    PortalId.remax: ("remax.com.ar",),
-    PortalId.century21: ("century21.com.ar",),
+    # E26: Remax CloudFront listing CDN + imgs subdomain
+    PortalId.remax: ("remax.com.ar", "cloudfront.net", "imgs.remax.com.ar"),
+    PortalId.century21: ("century21.com.ar", "21online.lat", "cdn.21online.lat"),
 }
 
 HOUSEHUNT_PLACEHOLDER_URL = "/placeholder-listing.svg"

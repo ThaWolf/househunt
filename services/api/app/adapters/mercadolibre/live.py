@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
+from app.adapters.rooms_parse import parse_rooms, rooms_min_from_filters
 from app.adapters.types import RawProperty
 from app.adapters.veracity import HOUSEHUNT_PLACEHOLDER_URL, image_host_ok_for_portal
 from app.config import Settings, get_settings
@@ -26,7 +27,11 @@ _LOCALITY_PATH = {
 
 
 def build_search_url(filters: SearchFilters) -> str:
-    base = "https://inmuebles.mercadolibre.com.ar/casas/venta/bsas-gba-sur/la-plata"
+    # Verified 2026-07-14:
+    # …/casas/venta/3-ambientes/bsas-gba-sur/la-plata/manuel-b-gonnet/
+    rooms_min = rooms_min_from_filters(filters)
+    rooms_seg = f"{rooms_min}-ambientes/" if rooms_min else ""
+    base = f"https://inmuebles.mercadolibre.com.ar/casas/venta/{rooms_seg}bsas-gba-sur/la-plata"
     loc = None
     if filters.location and filters.location.locality:
         loc = filters.location.locality.strip().lower()
@@ -38,7 +43,6 @@ def build_search_url(filters: SearchFilters) -> str:
             slug = re.sub(r"[^a-z0-9]+", "-", loc).strip("-")
         if slug:
             base = f"{base}/{slug}"
-    # PriceRange path fragments are fragile on inmuebles.*; filter client-side in filter_raw_items.
     return base + "/"
 
 
@@ -71,7 +75,6 @@ EXTRACT_JS = """
     if (!m) continue;
     const id = m[1];
     if (seen.has(id)) continue;
-    // Prefer real-estate item hosts
     if (!/mercadolibre\\.com\\.ar/i.test(href)) continue;
     seen.add(id);
     const card = a.closest('li') || a.closest('.ui-search-result') || a.closest('.poly-card') || a.parentElement;
@@ -82,8 +85,12 @@ EXTRACT_JS = """
     const currencyEl = card && card.querySelector(
       '.andes-money-amount__currency-symbol, .price-tag-symbol'
     );
+    const attrsEl = card && card.querySelector(
+      '.ui-search-card-attributes, .poly-attributes_list, .ui-search-item__group__element'
+    );
     const title = (a.textContent || '').trim();
     const imgSrc = img && (img.getAttribute('src') || img.getAttribute('data-src') || '');
+    const cardText = (card && card.innerText || '').slice(0, 600);
     out.push({
       id,
       href,
@@ -91,6 +98,8 @@ EXTRACT_JS = """
       img: imgSrc,
       price: priceEl && priceEl.textContent.trim(),
       currencySymbol: currencyEl && currencyEl.textContent.trim(),
+      attrs: attrsEl && attrsEl.textContent.trim(),
+      cardText,
     });
     if (out.length >= 40) break;
   }
@@ -108,6 +117,7 @@ async def scrape_mercadolibre(
     settings = settings or get_settings()
     url = build_search_url(filters)
     timeout_ms = int(max(settings.adapter_timeout_seconds, 20) * 1000)
+    rooms_min = rooms_min_from_filters(filters)
 
     async with browser_page(timeout_ms=timeout_ms) as page:
         final_url, _html, _status = await goto_html(page, url, wait_bot_clear_seconds=10.0)
@@ -130,8 +140,11 @@ async def scrape_mercadolibre(
         amount, currency = _parse_price_from_card(row.get("price"))
         if row.get("currencySymbol") and "U$S" in str(row.get("currencySymbol")).upper():
             currency = "USD"
+        rooms = parse_rooms(row.get("attrs"), row.get("cardText"), title, href)
+        if rooms is None and rooms_min is not None and f"{rooms_min}-ambientes" in url:
+            # Portal already filtered by N-ambientes path
+            rooms = rooms_min
         img_url = row.get("img") or ""
-        # Drop srcset / resize noise
         if " " in img_url:
             img_url = img_url.split()[0]
         images: list[dict] = []
@@ -155,6 +168,7 @@ async def scrape_mercadolibre(
                 address_province="Buenos Aires",
                 address_locality=locality,
                 address_neighborhood=None,
+                rooms=rooms,
                 images=images,
                 data_source=DataSource.live,
                 raw_hints={"source": "mercadolibre_live", "searchUrl": url},

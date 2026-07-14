@@ -75,6 +75,24 @@ class AdapterErrorCode(str, Enum):
     network = "network"
     not_implemented = "not_implemented"
     fixtures_only = "fixtures_only"
+    auth_required = "auth_required"
+    filtered_rooms_null = "filtered_rooms_null"
+
+
+class AdapterMaturity(str, Enum):
+    live_ok = "live_ok"
+    live_partial = "live_partial"
+    not_implemented = "not_implemented"
+    broken = "broken"
+
+
+class EmptyStateKind(str, Enum):
+    ok = "ok"
+    no_inventory = "no_inventory"
+    rooms_filter_wipe = "rooms_filter_wipe"
+    all_partial = "all_partial"
+    all_skipped = "all_skipped"
+    all_error = "all_error"
 
 
 class SearchModeHint(str, Enum):

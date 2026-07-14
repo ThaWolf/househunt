@@ -96,6 +96,7 @@ class PortalMeta(CamelModel):
     id: str
     enabled: bool
     analysis_status: str
+    maturity: str | None = None
     hybrid_default: bool = True
 
 

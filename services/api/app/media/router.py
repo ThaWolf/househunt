@@ -24,7 +24,10 @@ ALLOWED_HOST_SUFFIXES = (
     "mercadolibre.com.ar",
     "mlstatic.com",
     "remax.com.ar",
+    "cloudfront.net",
+    "imgs.remax.com.ar",
     "century21.com.ar",
+    "21online.lat",
 )
 
 

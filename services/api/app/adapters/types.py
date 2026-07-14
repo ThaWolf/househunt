@@ -81,6 +81,12 @@ class AdapterResult:
     unsupported_filters: list[str] = field(default_factory=list)
     pagination: AdapterPaginationMeta | None = None
     error: AdapterError | None = None
+    # E23 diagnostics (optional on adapter; search service fills gaps)
+    raw_count: int | None = None
+    rooms_dropped: int | None = None
+    rooms_filter_wiped: bool | None = None
+    maturity: str | None = None
+    drop_reasons: list[str] = field(default_factory=list)
 
 
 # Re-export for convenience
