@@ -6,12 +6,6 @@ import type {
 } from '@/api/types'
 import { portalCountRows, resolveEmptyState } from '@/lib/emptyState'
 
-const baseFilters: SearchResponse['filters'] = {
-  operation: 'buy',
-  propertyType: 'house',
-  rooms: { min: 3 },
-}
-
 function portal(
   partial: Partial<PortalSearchResult> & Pick<PortalSearchResult, 'portal'>,
 ): PortalSearchResult {
