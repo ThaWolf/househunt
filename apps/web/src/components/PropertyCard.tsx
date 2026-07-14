@@ -50,6 +50,11 @@ export function PropertyCard({ item }: Props) {
           <p className="text-xs text-ink-muted line-clamp-1">
             {formatLocation(item.address)}
           </p>
+          {item.descriptionExcerpt && (
+            <p className="text-xs text-ink-muted line-clamp-2">
+              {item.descriptionExcerpt}
+            </p>
+          )}
           <div className="flex items-center justify-between gap-2 pt-1">
             <span className="font-mono text-[10px] uppercase text-ink-muted">
               {PORTAL_LABELS[item.portal]}

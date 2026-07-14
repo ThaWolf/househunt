@@ -1,4 +1,13 @@
-import type { Money, Address, InterestFlags } from '@/api/types'
+import type { Money, Address, InterestFlags, ImageRef } from '@/api/types'
+
+/** Prefer real source/proxied URLs; skip typed placeholders when possible. */
+export function isRealImage(img: ImageRef): boolean {
+  if (img.kind === 'placeholder') return false
+  if (!img.url) return false
+  const u = img.url.toLowerCase()
+  if (u.startsWith('data:') && u.includes('placeholder')) return false
+  return true
+}
 
 export function formatMoney(price?: Money | null): string {
   if (!price || price.amount == null) return 'Consultar'
@@ -34,12 +43,18 @@ export function interestBadgeLabel(
   return null
 }
 
-export function primaryImageUrl(
-  images?: Array<{ url: string; order: number }> | null,
-): string | null {
+export function primaryImageUrl(images?: ImageRef[] | null): string | null {
   if (!images?.length) return null
   const sorted = [...images].sort((a, b) => a.order - b.order)
-  return sorted[0]?.url ?? null
+  const real = sorted.find(isRealImage)
+  return (real ?? sorted[0])?.url ?? null
+}
+
+export function galleryImages(images?: ImageRef[] | null): ImageRef[] {
+  if (!images?.length) return []
+  const sorted = [...images].sort((a, b) => a.order - b.order)
+  const real = sorted.filter(isRealImage)
+  return real.length > 0 ? real : sorted
 }
 
 /** Local datetime-local value ↔ ISO */

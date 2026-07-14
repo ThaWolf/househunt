@@ -5,12 +5,15 @@ import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { PropertyDetailResponse, Visit } from '@/api/types'
 import { PORTAL_LABELS } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { DescriptionBlock } from '@/components/DescriptionBlock'
 import { HumanizedReportView } from '@/components/HumanizedReportView'
 import { ImageGallery } from '@/components/ImageGallery'
 import { InterestBadge } from '@/components/InterestBadge'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
+import { PriceNarrativeView } from '@/components/PriceNarrativeView'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { VisitControls } from '@/components/VisitControls'
+import { ZoneMapBlock } from '@/components/ZoneMapBlock'
 import { formatLocation, formatMoney } from '@/lib/format'
 
 export function DetailPage() {
@@ -209,18 +212,21 @@ export function DetailPage() {
             </div>
           )}
 
-          {property.description && (
-            <div>
-              <h2 className="font-display text-xl font-semibold mb-2">Descripción</h2>
-              <p className="text-sm text-ink-muted whitespace-pre-wrap leading-relaxed">
-                {property.description}
-              </p>
-            </div>
-          )}
+          <DescriptionBlock
+            description={property.description}
+            excerpt={property.descriptionExcerpt}
+          />
 
           <HumanizedReportView
             report={report}
             fallbackAppScore={property.appScore}
+          />
+
+          <PriceNarrativeView narrative={report?.priceNarrative} />
+
+          <ZoneMapBlock
+            zoneReport={report?.zoneReport}
+            map={report?.map}
           />
 
           <a

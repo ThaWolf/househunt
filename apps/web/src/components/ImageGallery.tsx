@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { ImageRef } from '@/api/types'
+import { galleryImages } from '@/lib/format'
 
 type Props = {
   images: ImageRef[]
@@ -7,10 +8,7 @@ type Props = {
 }
 
 export function ImageGallery({ images, alt = '' }: Props) {
-  const sorted = useMemo(
-    () => [...images].sort((a, b) => a.order - b.order),
-    [images],
-  )
+  const sorted = useMemo(() => galleryImages(images), [images])
   const [index, setIndex] = useState(0)
   const [broken, setBroken] = useState<Set<number>>(() => new Set())
 
