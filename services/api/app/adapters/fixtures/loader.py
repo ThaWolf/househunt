@@ -19,6 +19,10 @@ def _raw_data() -> dict:
         return json.load(f)
 
 
+def clear_fixture_cache() -> None:
+    _raw_data.cache_clear()
+
+
 def load_fixture_properties(portal: PortalId) -> list[RawProperty]:
     rows = _raw_data().get(portal.value, [])
     out: list[RawProperty] = []

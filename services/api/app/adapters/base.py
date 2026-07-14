@@ -35,6 +35,9 @@ def unsupported_from_filters(filters: SearchFilters, supported: set[str]) -> lis
         present.append("parking")
     if filters.query:
         present.append("query")
-    if filters.geo.mode.value == "custom":
+    if filters.location is not None:
+        present.append("location")
+    elif filters.geo.mode.value == "custom":
         present.append("geo.custom")
     return [f for f in present if f not in supported]
+

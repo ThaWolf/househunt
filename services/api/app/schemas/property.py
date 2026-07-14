@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 
 from app.schemas.common import (
     Address,
@@ -49,10 +50,31 @@ class PropertyDTO(CamelModel):
     listed_at: datetime | None = None
     scraped_at: datetime
     app_score: int | None = None
+    # Deprecated for FE UI — prefer HumanizedReport on detail
     score_breakdown: ScoreBreakdown | None = None
 
 
+class Location(CamelModel):
+    query: str
+    locality: str
+    district: str | None = None
+    province: str
+    country: str = "AR"
+    place_id: str | None = None
+
+
+class GeoPlace(Location):
+    label: str
+    aliases: list[str] = Field(default_factory=list)
+
+
+class GeoSuggestResponse(CamelModel):
+    items: list[GeoPlace]
+
+
 class GeoFilters(CamelModel):
+    """Legacy iter-1 geo. Prefer SearchFilters.location."""
+
     mode: GeoMode = GeoMode.gba
     province: str | None = None
     locality: str | None = None
@@ -83,6 +105,7 @@ class AreaFilters(CamelModel):
 class SearchFilters(CamelModel):
     operation: Operation = Operation.buy
     property_type: PropertyType = PropertyType.house
+    location: Location | None = None
     geo: GeoFilters = Field(default_factory=GeoFilters)
     price: PriceFilters | None = None
     rooms: MinIntFilter | None = None
@@ -119,14 +142,34 @@ class SearchResponse(CamelModel):
     took_ms: int
 
 
-class ReportStub(CamelModel):
+class ScoreComponent(CamelModel):
+    id: Literal["attrs", "area", "zone", "priceFit", "risk"]
+    label: str
+    score: float
+    max_score: float = 100
+    bar_pct: float
+    note: str | None = None
+
+
+class RiskHit(CamelModel):
+    term: str
+    label: str
+
+
+class HumanizedReport(CamelModel):
     summary: str | None = None
-    risk_hits: list[str] = Field(default_factory=list)
-    generated_at: datetime | None = None
+    app_score: int
+    components: list[ScoreComponent] = Field(default_factory=list)
+    risk_hits: list[RiskHit] = Field(default_factory=list)
+    generated_at: datetime
+
+
+# Backward-compat alias
+ReportStub = HumanizedReport
 
 
 class PropertyDetailResponse(CamelModel):
     property: PropertyDTO
     interest: InterestFlags
-    report: ReportStub | None = None
+    report: HumanizedReport
     user_fields_enabled: bool

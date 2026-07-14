@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
@@ -10,8 +9,9 @@ from app.db import models
 from app.db.models import User
 from app.errors import AppError
 from app.mappers import interest_flags, property_to_dto
-from app.schemas.property import PropertyDetailResponse, ReportStub
+from app.schemas.property import PropertyDetailResponse
 from app.scoring.appscore import compute_appscore
+from app.scoring.humanize import build_humanized_report
 from app.adapters.types import RawProperty
 from app.schemas.common import Operation, PortalId, PropertyType
 
@@ -78,7 +78,8 @@ async def get_property(
         )
     ).scalar_one_or_none()
 
-    score = compute_appscore(_row_as_raw(row))
+    raw = _row_as_raw(row)
+    score = compute_appscore(raw)
     if row.app_score is None:
         row.app_score = score.score
         row.score_breakdown = score.breakdown.model_dump(by_alias=False)
@@ -98,18 +99,7 @@ async def get_property(
         flags.comments = None
         flags.comment_flag = False
 
-    report = ReportStub(
-        summary=(
-            "Reporte stub MVP: ZoneScore/POI pendiente. "
-            + (
-                f"Riesgo: {', '.join(score.breakdown.risk_hits)}."
-                if score.breakdown.risk_hits
-                else "Sin keywords de riesgo."
-            )
-        ),
-        risk_hits=score.breakdown.risk_hits,
-        generated_at=datetime.now(timezone.utc),
-    )
+    report = build_humanized_report(raw, score)
 
     return PropertyDetailResponse(
         property=property_to_dto(row),

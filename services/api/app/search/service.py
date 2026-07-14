@@ -24,6 +24,7 @@ from app.schemas.property import (
     SearchResultItem,
 )
 from app.scoring.appscore import compute_appscore
+from app.search.postfilter import filter_merged
 
 
 async def upsert_property(
@@ -167,12 +168,22 @@ async def run_search(
             row = await upsert_property(db, raw, poi_enabled=settings.feature_poi)
             merged_rows.append(row)
 
-    prop_ids = [r.id for r in merged_rows]
+    # Authoritative post-filter (geo / price / rooms) — fixtures included
+    filtered_rows = filter_merged(merged_rows, filters)
+
+    # Recount portal slices after post-filter
+    counts: dict[str, int] = {}
+    for row in filtered_rows:
+        counts[row.portal] = counts.get(row.portal, 0) + 1
+    for pr in portal_results:
+        pr.count = counts.get(pr.portal.value, 0)
+
+    prop_ids = [r.id for r in filtered_rows]
     interests = await _interest_overlay(db, user_id, prop_ids)
     visits = await _visits_overlay(db, user_id, prop_ids)
 
     items: list[SearchResultItem] = []
-    for row in merged_rows:
+    for row in filtered_rows:
         dto = property_to_dto(row)
         interest = interests.get(row.id)
         visit = visits.get(row.id)

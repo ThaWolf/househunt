@@ -23,16 +23,31 @@ PROBE_URLS: dict[PortalId, str] = {
     PortalId.century21: "https://century21.com.ar/busqueda/tipo_casa/operacion_venta",
 }
 
-SUPPORTED_FILTERS = {"price", "rooms", "bathrooms", "area", "parking", "query", "geo.custom"}
+SUPPORTED_FILTERS = {
+    "price",
+    "rooms",
+    "bathrooms",
+    "area",
+    "parking",
+    "query",
+    "geo.custom",
+    "location",
+}
 
 
 def filter_raw_items(items: list[RawProperty], filters: SearchFilters) -> list[RawProperty]:
+    """Light adapter-side filter. Merge post-filter is authoritative for geo/price/rooms."""
+    from app.geo.match import location_matches_listing
+    from app.search.postfilter import resolve_location
+
+    location = resolve_location(filters)
     out: list[RawProperty] = []
     for item in items:
-        if filters.property_type and item.property_type != filters.property_type:
-            # fixtures are houses; keep if house focus
-            pass
         if filters.price:
+            currency = (item.price_currency or "USD").upper()
+            want = filters.price.currency.value if filters.price.currency else "USD"
+            if currency != want:
+                continue
             if filters.price.min is not None and (
                 item.price_amount is None or item.price_amount < filters.price.min
             ):
@@ -43,6 +58,15 @@ def filter_raw_items(items: list[RawProperty], filters: SearchFilters) -> list[R
                 continue
         if filters.rooms and filters.rooms.min is not None:
             if item.rooms is None or item.rooms < filters.rooms.min:
+                continue
+        if location is not None:
+            if not location_matches_listing(
+                location,
+                address_locality=item.address_locality,
+                address_neighborhood=item.address_neighborhood,
+                address_raw=item.address_raw,
+                title=item.title,
+            ):
                 continue
         if filters.query:
             q = filters.query.lower()

@@ -17,10 +17,18 @@ from app.schemas.common import (
 from app.schemas.property import PropertyDTO
 
 
+class AmenityHighlight(CamelModel):
+    token: str
+    label: str
+    present: bool
+
+
 class InterestItem(CamelModel):
     id: UUID
     property: PropertyDTO
     state: InterestState
+    rooms: int | None = None
+    amenities_highlight: list[AmenityHighlight] = Field(default_factory=list)
     user_score: int | None = None
     visit: Visit
     comments: str | None = None

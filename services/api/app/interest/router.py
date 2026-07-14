@@ -11,6 +11,7 @@ from app.db import models
 from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
+from app.interest.amenities import amenities_highlight
 from app.mappers import property_to_dto
 from app.schemas.common import InterestState, PageMeta, Visit, VisitStatus
 from app.schemas.interest import (
@@ -27,14 +28,17 @@ def _to_item(
     interest: models.InterestItem,
     visit: models.Visit | None,
 ) -> InterestItem:
+    prop = interest.property
     v = Visit(
         status=VisitStatus(visit.status) if visit else VisitStatus.none,
         at=visit.at.isoformat() if visit and visit.at else None,
     )
     return InterestItem(
         id=interest.id,
-        property=property_to_dto(interest.property),
+        property=property_to_dto(prop),
         state=InterestState(interest.state),
+        rooms=prop.rooms if prop else None,
+        amenities_highlight=amenities_highlight(list(prop.amenities or []) if prop else []),
         user_score=interest.user_score,
         visit=v,
         comments=interest.comments,
