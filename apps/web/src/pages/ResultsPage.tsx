@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { SearchResponse } from '@/api/types'
+import { DataSourceBanner } from '@/components/DataSourceBanner'
 import { PortalErrorsBanner } from '@/components/PortalErrors'
 import { PropertyCard } from '@/components/PropertyCard'
 import { ErrorState } from '@/components/LoadingState'
@@ -47,6 +48,7 @@ export function ResultsPage() {
       </div>
 
       <PortalErrorsBanner portalResults={data.portalResults} />
+      <DataSourceBanner items={data.items} density={data.density} />
 
       {data.items.length === 0 ? (
         <p className="text-ink-muted py-12 text-center">

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { ImageRef } from '@/api/types'
+import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
 import { galleryImages } from '@/lib/format'
 
 type Props = {
@@ -35,9 +36,7 @@ export function ImageGallery({ images, alt = '' }: Props) {
           }}
         />
       ) : (
-        <div className="flex h-[280px] sm:h-[400px] items-center justify-center text-white/40 font-mono text-sm">
-          Sin imagen
-        </div>
+        <HousehuntPlaceholder size="hero" label="Sin foto del aviso" />
       )}
 
       {usable.length > 1 && (

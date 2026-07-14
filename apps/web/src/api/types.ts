@@ -1,4 +1,4 @@
-/** DTOs aligned to factory design API_CONTRACT.md iter 3 (camelCase wire). */
+/** DTOs aligned to factory design API_CONTRACT.md iter 4 (camelCase wire). */
 
 export type PortalId =
   | 'zonaprop'
@@ -31,7 +31,11 @@ export type ScoreComponentId =
   | 'risk'
 
 export type PriceStance = 'low' | 'fair' | 'high' | 'unknown'
+/** E19 — required on every ImageRef. */
 export type ImageKind = 'source' | 'proxied' | 'placeholder'
+/** E17 — required on Property. FE alias listingFidelity ≡ same values. */
+export type DataSource = 'live' | 'fixture_curated' | 'demo_stub'
+export type DataSourceHint = DataSource | 'mixed'
 export type ZonePlaceSource = 'seed' | 'places' | 'stub'
 export type ZoneProvider = 'none' | 'seed' | 'google_places'
 export type GeocodeStatus = 'exact' | 'approximate' | 'missing' | 'stub'
@@ -66,7 +70,8 @@ export interface Area {
 export interface ImageRef {
   url: string
   order: number
-  kind?: ImageKind
+  /** E19 — required on wire; missing treated as placeholder in UI. */
+  kind: ImageKind
 }
 
 export interface Agent {
@@ -177,6 +182,13 @@ export interface Property {
   portal: PortalId
   externalId: string
   sourceUrl: string
+  /**
+   * E17 — required. live | fixture_curated | demo_stub.
+   * Missing on wire → FE treats as non-live (badge + CTA rules).
+   */
+  dataSource: DataSource
+  /** Display alias of dataSource (same enum); prefer dataSource on wire. */
+  listingFidelity?: DataSource
   title: string
   /** Full listing text when available (E13). */
   description: string | null
@@ -242,6 +254,7 @@ export interface AdapterPaginationMeta {
   maxPages?: number
   pageSizeHint?: number
   mode?: SearchModeHint | null
+  dataSourceHint?: DataSourceHint | null
 }
 
 export interface PortalSearchResult {
@@ -270,6 +283,7 @@ export interface SearchResponse {
     totalItems?: number
     portalsWithMultiPage?: number
     mode?: SearchModeHint
+    dataSourceHint?: DataSourceHint | null
   } | null
   tookMs: number
 }

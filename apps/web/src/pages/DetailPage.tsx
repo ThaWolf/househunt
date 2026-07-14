@@ -5,16 +5,19 @@ import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { PropertyDetailResponse, Visit } from '@/api/types'
 import { PORTAL_LABELS } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { DataSourceBadge } from '@/components/DataSourceBadge'
 import { DescriptionBlock } from '@/components/DescriptionBlock'
 import { HumanizedReportView } from '@/components/HumanizedReportView'
 import { ImageGallery } from '@/components/ImageGallery'
 import { InterestBadge } from '@/components/InterestBadge'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
+import { PortalCta } from '@/components/PortalCta'
 import { PriceNarrativeView } from '@/components/PriceNarrativeView'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { VisitControls } from '@/components/VisitControls'
 import { ZoneMapBlock } from '@/components/ZoneMapBlock'
 import { formatLocation, formatMoney } from '@/lib/format'
+import { resolveDataSource } from '@/lib/listingFidelity'
 
 export function DetailPage() {
   const { propertyId } = useParams<{ propertyId: string }>()
@@ -132,6 +135,7 @@ export function DetailPage() {
   }
 
   const { property, report, userFieldsEnabled, interest } = data
+  const dataSource = resolveDataSource(property)
   const canAdd =
     !interest?.state || (interest.state !== 'active' && interest.state !== 'archived')
 
@@ -152,6 +156,7 @@ export function DetailPage() {
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="mb-2 flex flex-wrap gap-2">
+            <DataSourceBadge dataSource={dataSource} />
             <InterestBadge interest={interest} />
             <span className="rounded bg-ink/5 px-1.5 py-0.5 font-mono text-[10px] uppercase text-ink-muted">
               {PORTAL_LABELS[property.portal]}
@@ -229,14 +234,11 @@ export function DetailPage() {
             map={report?.map}
           />
 
-          <a
-            href={property.sourceUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hh-btn-ghost inline-flex no-underline text-sm"
-          >
-            Abrir publicación original ↗
-          </a>
+          <PortalCta
+            dataSource={dataSource}
+            sourceUrl={property.sourceUrl}
+            variant="detail"
+          />
         </section>
 
         <aside className="space-y-4">

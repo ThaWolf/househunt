@@ -65,6 +65,13 @@
     transform: translateY(-2px);
   }
 
+  /* Owned placeholder — never stock CDN (E19) */
+  .hh-placeholder {
+    width: 100%;
+    background:
+      linear-gradient(145deg, #0b1320 0%, #0f766e 48%, #0e7490 100%);
+  }
+
   .hh-btn-primary,
   .hh-btn-accent,
   .hh-btn-ghost {

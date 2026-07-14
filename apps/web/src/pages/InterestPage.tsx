@@ -4,9 +4,12 @@ import { ApiError } from '@/api/client'
 import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { AmenityHighlight, InterestItem } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { DataSourceBadge } from '@/components/DataSourceBadge'
+import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
+import { resolveDataSource } from '@/lib/listingFidelity'
 
 function AmenityCell({ items }: { items: AmenityHighlight[] }) {
   if (!items?.length) {
@@ -146,6 +149,7 @@ export function InterestPage() {
               {items.map((item) => {
                 const thumb = primaryImageUrl(item.property.images)
                 const rooms = item.rooms ?? item.property.rooms
+                const dataSource = resolveDataSource(item.property)
                 return (
                   <tr
                     key={item.id}
@@ -157,10 +161,19 @@ export function InterestPage() {
                       <div className="h-9 w-9 overflow-hidden rounded bg-line/50">
                         {thumb ? (
                           <img src={thumb} alt="" className="h-full w-full object-cover" />
-                        ) : null}
+                        ) : (
+                          <HousehuntPlaceholder
+                            size="compact"
+                            label=""
+                            className="!min-h-0 h-9"
+                          />
+                        )}
                       </div>
                     </td>
                     <td className="px-2 py-1.5 max-w-[220px]">
+                      <div className="mb-0.5">
+                        <DataSourceBadge dataSource={dataSource} />
+                      </div>
                       <Link
                         to={`/properties/${item.property.id}`}
                         className="line-clamp-2 font-medium text-ink no-underline hover:text-accent"

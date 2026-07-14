@@ -2,8 +2,12 @@ import { Link } from 'react-router-dom'
 import type { SearchResultItem } from '@/api/types'
 import { PORTAL_LABELS } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { DataSourceBadge } from '@/components/DataSourceBadge'
+import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
 import { InterestBadge } from '@/components/InterestBadge'
+import { PortalCta } from '@/components/PortalCta'
 import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
+import { resolveDataSource } from '@/lib/listingFidelity'
 
 type Props = {
   item: SearchResultItem
@@ -11,6 +15,7 @@ type Props = {
 
 export function PropertyCard({ item }: Props) {
   const img = primaryImageUrl(item.images)
+  const dataSource = resolveDataSource(item)
   const badgeBlocked =
     item.interest?.state === 'active' || item.interest?.state === 'archived'
 
@@ -19,21 +24,29 @@ export function PropertyCard({ item }: Props) {
       <Link to={`/properties/${item.id}`} className="block no-underline text-inherit">
         <div className="relative aspect-[4/3] bg-line/60 overflow-hidden">
           {img ? (
-            <img
-              src={img}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none'
-              }}
-            />
+            <>
+              <img
+                src={img}
+                alt=""
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'
+                  const ph = e.currentTarget.parentElement?.querySelector(
+                    '[data-testid="househunt-placeholder"]',
+                  )
+                  if (ph instanceof HTMLElement) ph.hidden = false
+                }}
+              />
+              <div hidden className="absolute inset-0">
+                <HousehuntPlaceholder size="compact" label="Sin foto del aviso" />
+              </div>
+            </>
           ) : (
-            <div className="flex h-full items-center justify-center font-mono text-xs text-ink-muted">
-              Sin imagen
-            </div>
+            <HousehuntPlaceholder size="compact" label="Sin foto del aviso" />
           )}
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+            <DataSourceBadge dataSource={dataSource} />
             <InterestBadge interest={item.interest} />
           </div>
           <div className="absolute bottom-2 right-2">
@@ -67,14 +80,11 @@ export function PropertyCard({ item }: Props) {
         </div>
       </Link>
       <div className="border-t border-line px-3 py-2">
-        <a
-          href={item.sourceUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-[11px] text-accent no-underline hover:underline"
-        >
-          Ver en portal ↗
-        </a>
+        <PortalCta
+          dataSource={dataSource}
+          sourceUrl={item.sourceUrl}
+          variant="card"
+        />
       </div>
     </article>
   )

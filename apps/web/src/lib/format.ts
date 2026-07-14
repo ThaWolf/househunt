@@ -1,11 +1,17 @@
 import type { Money, Address, InterestFlags, ImageRef } from '@/api/types'
+import { isStockImageUrl } from '@/lib/listingFidelity'
 
-/** Prefer real source/proxied URLs; skip typed placeholders when possible. */
+/**
+ * Prefer real source/proxied URLs.
+ * Never treat stock CDN or kind=placeholder as listing photos (E19–E20).
+ */
 export function isRealImage(img: ImageRef): boolean {
-  if (img.kind === 'placeholder') return false
+  const kind = img.kind ?? 'placeholder'
+  if (kind === 'placeholder') return false
   if (!img.url) return false
   const u = img.url.toLowerCase()
   if (u.startsWith('data:') && u.includes('placeholder')) return false
+  if (isStockImageUrl(img.url)) return false
   return true
 }
 
@@ -43,18 +49,19 @@ export function interestBadgeLabel(
   return null
 }
 
+/** First displayable listing photo URL, or null → Househunt placeholder UI. */
 export function primaryImageUrl(images?: ImageRef[] | null): string | null {
   if (!images?.length) return null
   const sorted = [...images].sort((a, b) => a.order - b.order)
   const real = sorted.find(isRealImage)
-  return (real ?? sorted[0])?.url ?? null
+  return real?.url ?? null
 }
 
+/** Gallery: only real photos. Empty → caller shows Househunt placeholder. */
 export function galleryImages(images?: ImageRef[] | null): ImageRef[] {
   if (!images?.length) return []
   const sorted = [...images].sort((a, b) => a.order - b.order)
-  const real = sorted.filter(isRealImage)
-  return real.length > 0 ? real : sorted
+  return sorted.filter(isRealImage)
 }
 
 /** Local datetime-local value ↔ ISO */
