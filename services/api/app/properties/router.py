@@ -1,19 +1,24 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.adapters.types import RawProperty
 from app.auth.deps import get_current_user
-from app.db.base import get_db
+from app.config import get_settings
 from app.db import models
+from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
 from app.mappers import interest_flags, property_to_dto
+from app.schemas.common import Operation, PortalId, PropertyType
 from app.schemas.property import PropertyDetailResponse
 from app.scoring.appscore import compute_appscore
 from app.scoring.humanize import build_humanized_report
-from app.adapters.types import RawProperty
-from app.schemas.common import Operation, PortalId, PropertyType
+from app.scoring.narrative import is_peer
+from app.zone.maps import build_map_embed
+from app.zone.report import build_zone_report
 
 router = APIRouter(prefix="/properties", tags=["properties"])
 
@@ -55,11 +60,10 @@ async def get_property(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> PropertyDetailResponse:
+    settings = get_settings()
     row = await db.get(models.Property, property_id)
     if row is None:
         raise AppError(404, "not_found", "Property not found")
-
-    from sqlalchemy import select
 
     interest = (
         await db.execute(
@@ -79,11 +83,29 @@ async def get_property(
     ).scalar_one_or_none()
 
     raw = _row_as_raw(row)
-    score = compute_appscore(raw)
+    score = compute_appscore(raw, poi_enabled=settings.feature_poi)
     if row.app_score is None:
         row.app_score = score.score
         row.score_breakdown = score.breakdown.model_dump(by_alias=False)
         await db.flush()
+
+    # Cohort peers from cache (same locality, rooms ±1)
+    peer_rows = (
+        await db.execute(
+            select(models.Property).where(
+                models.Property.id != property_id,
+                models.Property.address_locality == row.address_locality,
+            )
+        )
+    ).scalars().all()
+    peers: list[RawProperty] = []
+    for p in peer_rows:
+        cand = _row_as_raw(p)
+        if is_peer(raw, cand):
+            peers.append(cand)
+
+    zone_report = build_zone_report(raw)
+    map_embed = build_map_embed(raw, zone_report, settings=settings)
 
     enabled = interest is not None and interest.state in ("active", "archived")
     flags = interest_flags(
@@ -99,7 +121,14 @@ async def get_property(
         flags.comments = None
         flags.comment_flag = False
 
-    report = build_humanized_report(raw, score)
+    report = build_humanized_report(
+        raw,
+        score,
+        poi_enabled=settings.feature_poi,
+        peers=peers,
+        zone_report=zone_report,
+        map_embed=map_embed,
+    )
 
     return PropertyDetailResponse(
         property=property_to_dto(row),

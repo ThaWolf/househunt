@@ -1,4 +1,4 @@
-"""Shared adapter helpers: fixtures + optional live probe."""
+"""Shared adapter helpers: fixtures + hybrid live probe + dense fallback."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import httpx
 
 from app.adapters.base import unsupported_from_filters
 from app.adapters.fixtures.loader import load_fixture_properties
-from app.adapters.types import AdapterError, AdapterResult, RawProperty
+from app.adapters.types import AdapterError, AdapterPaginationMeta, AdapterResult, RawProperty
 from app.config import Settings, get_settings
 from app.schemas.common import AdapterErrorCode, AdapterStatus, PortalId
 from app.schemas.property import SearchFilters
@@ -33,6 +33,18 @@ SUPPORTED_FILTERS = {
     "geo.custom",
     "location",
 }
+
+
+def _pagination_knobs(
+    filters: SearchFilters, settings: Settings
+) -> tuple[int, int]:
+    max_pages = filters.max_pages if filters.max_pages is not None else settings.adapter_max_pages
+    page_size = (
+        filters.page_size_hint
+        if filters.page_size_hint is not None
+        else settings.adapter_page_size_hint
+    )
+    return max(1, min(5, max_pages)), max(5, min(50, page_size))
 
 
 def filter_raw_items(items: list[RawProperty], filters: SearchFilters) -> list[RawProperty]:
@@ -106,6 +118,33 @@ async def probe_url(url: str, timeout: float) -> tuple[bool, str | None]:
         return False, "network"
 
 
+def dense_fixture_slice(
+    portal: PortalId,
+    filters: SearchFilters,
+    *,
+    max_pages: int,
+    page_size: int,
+    mode: str,
+) -> tuple[list[RawProperty], AdapterPaginationMeta]:
+    """Return dense fixtures (≥8–15 typical) with pagination meta — never 1-item fallback."""
+    raw_all = load_fixture_properties(portal)
+    filtered = filter_raw_items(raw_all, filters)
+    cap = max(page_size * max_pages, 15)
+    items = filtered[:cap]
+    pages_fetched = 0
+    if items:
+        pages_fetched = min(max_pages, max(1, (len(items) + page_size - 1) // page_size))
+    pagination = AdapterPaginationMeta(
+        pages_fetched=pages_fetched,
+        listings_raw=len(raw_all),
+        listings_after_filter=len(items),
+        max_pages=max_pages,
+        page_size_hint=page_size,
+        mode=mode,
+    )
+    return items, pagination
+
+
 async def fetch_with_fixtures(
     portal: PortalId,
     filters: SearchFilters,
@@ -114,48 +153,67 @@ async def fetch_with_fixtures(
     analysis_status: str = "needs_probe",
     try_live: bool = False,
 ) -> AdapterResult:
+    """Fixtures-only or hybrid: live probe → on fail/bot_wall merge dense fixtures."""
+    _ = analysis_status
     settings = settings or get_settings()
     unsupported = unsupported_from_filters(filters, SUPPORTED_FILTERS)
+    max_pages, page_size = _pagination_knobs(filters, settings)
 
-    if settings.adapter_use_fixtures or not try_live:
-        items = filter_raw_items(load_fixture_properties(portal), filters)
-        # fixtures_only is informational when flag on — still status ok for MVP UX
+    # ADAPTER_USE_FIXTURES=true → dense fixtures (CI/default)
+    if settings.adapter_use_fixtures:
+        items, pagination = dense_fixture_slice(
+            portal, filters, max_pages=max_pages, page_size=page_size, mode="fixtures"
+        )
         return AdapterResult(
             portal=portal,
             status=AdapterStatus.ok if items else AdapterStatus.partial,
             items=items,
             unsupported_filters=unsupported,
+            pagination=pagination,
             error=AdapterError(
                 code=AdapterErrorCode.fixtures_only,
-                message="Serving fixture listings (ADAPTER_USE_FIXTURES or live scrape deferred)",
+                message="Serving dense fixture listings (ADAPTER_USE_FIXTURES)",
                 retryable=True,
-            )
-            if settings.adapter_use_fixtures
-            else None,
+            ),
         )
 
-    # Live probe path (minimal): check entrypoint; on success still fall back to fixtures parse
+    # Hybrid path (ADAPTER_USE_FIXTURES=false): probe live; on fail merge dense fixtures
     url = PROBE_URLS[portal]
     ok, err = await probe_url(url, settings.adapter_timeout_seconds)
-    items = filter_raw_items(load_fixture_properties(portal), filters)
+    items, pagination = dense_fixture_slice(
+        portal, filters, max_pages=max_pages, page_size=page_size, mode="hybrid"
+    )
     if not ok:
         code = AdapterErrorCode(err or "network")
-        # Degrade to fixtures with partial
         return AdapterResult(
             portal=portal,
             status=AdapterStatus.partial if items else AdapterStatus.error,
             items=items,
             unsupported_filters=unsupported,
+            pagination=pagination,
             error=AdapterError(
                 code=code,
-                message=f"Live probe failed for {portal.value}; returning fixtures",
-                retryable=code in (AdapterErrorCode.network, AdapterErrorCode.rate_limit),
+                message=(
+                    f"Live probe failed for {portal.value} ({code.value}); "
+                    f"returning dense fixtures ({len(items)} items)"
+                ),
+                retryable=code
+                in (
+                    AdapterErrorCode.network,
+                    AdapterErrorCode.rate_limit,
+                    AdapterErrorCode.bot_wall,
+                ),
             ),
         )
+
+    # Live ok — parse deferred; dense fixtures as floor with hybrid meta
+    if try_live or settings.adapter_hybrid_default:
+        pagination.pages_fetched = max(pagination.pages_fetched, 1)
     return AdapterResult(
         portal=portal,
-        status=AdapterStatus.ok,
+        status=AdapterStatus.ok if items else AdapterStatus.partial,
         items=items,
         unsupported_filters=unsupported,
+        pagination=pagination,
         error=None,
     )

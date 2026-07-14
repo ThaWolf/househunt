@@ -25,14 +25,19 @@ async def adapters_meta(user: User = Depends(get_current_user)) -> AdaptersMetaR
             PortalMeta(
                 id=portal.value,
                 enabled=settings.adapter_enabled(portal.value),
-                analysis_status=getattr(adapter, "analysis_status", settings.analysis_status(portal.value)),
+                analysis_status=getattr(
+                    adapter, "analysis_status", settings.analysis_status(portal.value)
+                ),
+                hybrid_default=settings.adapter_hybrid_default,
             )
         )
     return AdaptersMetaResponse(
         portals=portals,
         features={
             "googleCalendar": settings.effective_google_calendar(),
+            "googleMaps": settings.effective_google_maps(),
             "imageProxy": settings.feature_image_proxy,
             "poi": settings.feature_poi,
+            "hybridAdapters": settings.adapter_hybrid_default,
         },
     )

@@ -16,15 +16,23 @@ from app.schemas.common import (
     Currency,
     GeoMode,
     GeoPoint,
+    GeocodeSource,
+    GeocodeStatus,
     ImageRef,
     InterestFlags,
+    MapPinKind,
+    MapProvider,
     Money,
     Operation,
     PortalId,
+    PriceStance,
     PropertyType,
     ScoreBreakdown,
+    SearchModeHint,
     AdapterErrorCode,
     AdapterStatus,
+    ZonePlaceSource,
+    ZoneProvider,
 )
 
 
@@ -35,6 +43,7 @@ class PropertyDTO(CamelModel):
     source_url: str
     title: str
     description: str | None = None
+    description_excerpt: str | None = None
     operation: Operation
     property_type: PropertyType
     price: Money | None = None
@@ -114,6 +123,8 @@ class SearchFilters(CamelModel):
     parking: MinIntFilter | None = None
     portals: list[PortalId] | None = None
     query: str | None = None
+    max_pages: int | None = Field(default=3, ge=1, le=5)
+    page_size_hint: int | None = Field(default=20, ge=5, le=50)
 
 
 class PortalSearchError(CamelModel):
@@ -122,12 +133,28 @@ class PortalSearchError(CamelModel):
     retryable: bool = False
 
 
+class AdapterPaginationMetaDTO(CamelModel):
+    pages_fetched: int = 0
+    listings_raw: int = 0
+    listings_after_filter: int = 0
+    max_pages: int = 3
+    page_size_hint: int = 20
+    mode: SearchModeHint | None = None
+
+
 class PortalSearchResult(CamelModel):
     portal: PortalId
     status: AdapterStatus
     count: int = 0
     unsupported_filters: list[str] = Field(default_factory=list)
+    pagination: AdapterPaginationMetaDTO | None = None
     error: PortalSearchError | None = None
+
+
+class SearchDensity(CamelModel):
+    total_items: int
+    portals_with_multi_page: int = 0
+    mode: SearchModeHint = SearchModeHint.hybrid
 
 
 class SearchResultItem(PropertyDTO):
@@ -139,21 +166,86 @@ class SearchResponse(CamelModel):
     filters: SearchFilters
     items: list[SearchResultItem]
     portal_results: list[PortalSearchResult]
+    density: SearchDensity | None = None
     took_ms: int
 
 
 class ScoreComponent(CamelModel):
-    id: Literal["attrs", "area", "zone", "priceFit", "risk"]
+    id: Literal["attrs", "area", "zone", "priceFit", "riskSafety", "risk"]
     label: str
+    help_text: str
     score: float
     max_score: float = 100
     bar_pct: float
-    note: str | None = None
+    summary: str | None = None
+    note: str | None = None  # legacy alias of summary
 
 
 class RiskHit(CamelModel):
-    term: str
+    keyword: str | None = None
+    term: str | None = None  # legacy alias
+    weight: float = 1.0
+    label: str | None = None
+
+    @model_validator(mode="after")
+    def sync_keyword_term(self) -> RiskHit:
+        if self.keyword is None and self.term is not None:
+            self.keyword = self.term
+        if self.term is None and self.keyword is not None:
+            self.term = self.keyword
+        return self
+
+
+class PriceNarrative(CamelModel):
+    summary: str
+    stance: PriceStance
+    peers_sample_size: int
+    peer_median_amount: float | None = None
+    currency: Currency | None = None
+
+
+class ZonePlace(CamelModel):
+    id: str
+    name: str
+    category: str
+    lat: float | None = None
+    lng: float | None = None
+    distance_m: float | None = None
+    source: ZonePlaceSource = ZonePlaceSource.seed
+
+
+class ZoneGeo(CamelModel):
+    lat: float | None = None
+    lng: float | None = None
+    geocode_status: GeocodeStatus
+    geocode_source: GeocodeSource | None = None
+
+
+class ZoneReport(CamelModel):
+    summary: str | None = None
+    poi: list[ZonePlace] = Field(default_factory=list)
+    commerce: list[ZonePlace] = Field(default_factory=list)
+    transit: list[ZonePlace] = Field(default_factory=list)
+    geo: ZoneGeo
+    generated_at: datetime
+    provider: ZoneProvider = ZoneProvider.seed
+
+
+class MapPin(CamelModel):
+    id: str
+    lat: float
+    lng: float
     label: str
+    kind: MapPinKind
+
+
+class MapEmbed(CamelModel):
+    center: GeoPoint
+    zoom: int | None = 14
+    pins: list[MapPin] = Field(default_factory=list)
+    embed_url: str | None = None
+    external_url: str
+    provider: MapProvider = MapProvider.external_only
 
 
 class HumanizedReport(CamelModel):
@@ -161,6 +253,9 @@ class HumanizedReport(CamelModel):
     app_score: int
     components: list[ScoreComponent] = Field(default_factory=list)
     risk_hits: list[RiskHit] = Field(default_factory=list)
+    price_narrative: PriceNarrative | None = None
+    zone_report: ZoneReport | None = None
+    map: MapEmbed | None = None
     generated_at: datetime
 
 

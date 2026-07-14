@@ -77,6 +77,57 @@ class AdapterErrorCode(str, Enum):
     fixtures_only = "fixtures_only"
 
 
+class SearchModeHint(str, Enum):
+    fixtures = "fixtures"
+    live = "live"
+    hybrid = "hybrid"
+
+
+class PriceStance(str, Enum):
+    low = "low"
+    fair = "fair"
+    high = "high"
+    unknown = "unknown"
+
+
+class ZonePlaceSource(str, Enum):
+    seed = "seed"
+    places = "places"
+    stub = "stub"
+
+
+class ZoneProvider(str, Enum):
+    none = "none"
+    seed = "seed"
+    google_places = "google_places"
+
+
+class GeocodeStatus(str, Enum):
+    exact = "exact"
+    approximate = "approximate"
+    missing = "missing"
+    stub = "stub"
+
+
+class GeocodeSource(str, Enum):
+    portal = "portal"
+    seed_locality = "seed_locality"
+    places = "places"
+    manual = "manual"
+
+
+class MapPinKind(str, Enum):
+    listing = "listing"
+    poi = "poi"
+    commerce = "commerce"
+    transit = "transit"
+
+
+class MapProvider(str, Enum):
+    google_embed = "google_embed"
+    external_only = "external_only"
+
+
 class ErrorResponse(CamelModel):
     code: str
     message: str
@@ -112,9 +163,16 @@ class Area(CamelModel):
     total_m2: float | None = None
 
 
+class ImageKind(str, Enum):
+    source = "source"
+    proxied = "proxied"
+    placeholder = "placeholder"
+
+
 class ImageRef(CamelModel):
     url: str
     order: int
+    kind: ImageKind = ImageKind.source
 
 
 class Agent(CamelModel):

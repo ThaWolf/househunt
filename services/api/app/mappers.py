@@ -12,6 +12,7 @@ from app.schemas.common import (
     Area,
     Currency,
     GeoPoint,
+    ImageKind,
     ImageRef,
     InterestFlags,
     InterestState,
@@ -35,12 +36,38 @@ def _dt(value: datetime | None) -> datetime | None:
     return value
 
 
+def _excerpt(description: str | None, limit: int = 280) -> str | None:
+    if not description:
+        return None
+    text = description.strip()
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "…"
+
+
+def _images_to_refs(images: list | None) -> list[ImageRef]:
+    out: list[ImageRef] = []
+    for img in images or []:
+        if isinstance(img, dict):
+            kind = img.get("kind") or "source"
+            try:
+                kind_enum = ImageKind(kind)
+            except ValueError:
+                kind_enum = ImageKind.source
+            out.append(
+                ImageRef(url=img["url"], order=int(img.get("order", 0)), kind=kind_enum)
+            )
+        else:
+            out.append(ImageRef.model_validate(img))
+    return out
+
+
 def property_to_dto(row: models.Property) -> PropertyDTO:
     breakdown = None
     if row.score_breakdown:
         breakdown = ScoreBreakdown.model_validate(row.score_breakdown)
 
-    images = [ImageRef.model_validate(img) for img in (row.images or [])]
+    images = _images_to_refs(row.images)
     price = None
     if row.price_amount is not None or row.price_currency:
         price = Money(
@@ -56,6 +83,7 @@ def property_to_dto(row: models.Property) -> PropertyDTO:
         source_url=row.source_url,
         title=row.title,
         description=row.description,
+        description_excerpt=_excerpt(row.description),
         operation=Operation(row.operation),
         property_type=PropertyType(row.property_type),
         price=price,

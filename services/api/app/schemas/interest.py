@@ -96,6 +96,7 @@ class PortalMeta(CamelModel):
     id: str
     enabled: bool
     analysis_status: str
+    hybrid_default: bool = True
 
 
 class AdaptersMetaResponse(CamelModel):

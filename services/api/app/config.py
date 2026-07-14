@@ -51,9 +51,14 @@ class Settings(BaseSettings):
     adapter_remax_enabled: bool = Field(default=True, alias="ADAPTER_REMAX_ENABLED")
     adapter_century21_enabled: bool = Field(default=True, alias="ADAPTER_CENTURY21_ENABLED")
     adapter_use_fixtures: bool = Field(default=True, alias="ADAPTER_USE_FIXTURES")
+    adapter_hybrid_default: bool = Field(default=True, alias="ADAPTER_HYBRID_DEFAULT")
     adapter_timeout_seconds: float = Field(default=12.0, alias="ADAPTER_TIMEOUT_SECONDS")
+    adapter_max_pages: int = Field(default=3, alias="ADAPTER_MAX_PAGES")
+    adapter_page_size_hint: int = Field(default=20, alias="ADAPTER_PAGE_SIZE_HINT")
 
+    google_maps_api_key: str | None = Field(default=None, alias="GOOGLE_MAPS_API_KEY")
     feature_google_calendar: bool = Field(default=False, alias="FEATURE_GOOGLE_CALENDAR")
+    feature_google_maps: bool = Field(default=True, alias="FEATURE_GOOGLE_MAPS")
     feature_poi: bool = Field(default=False, alias="FEATURE_POI")
     feature_image_proxy: bool = Field(default=True, alias="FEATURE_IMAGE_PROXY")
 
@@ -83,6 +88,13 @@ class Settings(BaseSettings):
 
     def effective_google_calendar(self) -> bool:
         return bool(self.feature_google_calendar and self.google_oauth_configured())
+
+    def google_maps_key_valid(self) -> bool:
+        key = (self.google_maps_api_key or "").strip()
+        return bool(key) and not key.startswith("********")
+
+    def effective_google_maps(self) -> bool:
+        return bool(self.feature_google_maps and self.google_maps_key_valid())
 
     def adapter_enabled(self, portal: str) -> bool:
         mapping = {

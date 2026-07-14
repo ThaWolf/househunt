@@ -17,11 +17,13 @@ router = APIRouter(prefix="/media", tags=["media"])
 
 ALLOWED_HOST_SUFFIXES = (
     "zonaprop.com.ar",
+    "zonapropcdn.com",
     "argenprop.com",
     "mercadolibre.com.ar",
     "mlstatic.com",
     "remax.com.ar",
     "century21.com.ar",
+    "picsum.photos",
     "placehold.co",
 )
 

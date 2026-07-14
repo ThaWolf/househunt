@@ -42,6 +42,8 @@ def load_fixture_properties(portal: PortalId) -> list[RawProperty]:
                 address_province=row.get("addressProvince"),
                 address_locality=row.get("addressLocality"),
                 address_neighborhood=row.get("addressNeighborhood"),
+                geo_lat=row.get("geoLat"),
+                geo_lng=row.get("geoLng"),
                 rooms=row.get("rooms"),
                 bathrooms=row.get("bathrooms"),
                 parking=row.get("parking"),

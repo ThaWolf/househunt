@@ -1,421 +1,2202 @@
 {
   "zonaprop": [
     {
-      "externalId": "zp-1001",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-vicente-lopez-1001.html",
-      "title": "Casa 4 ambientes en Vicente López",
-      "description": "Hermosa casa con jardín y pileta. Living luminoso.",
-      "priceAmount": 285000,
-      "priceCurrency": "USD",
-      "addressRaw": "Vicente López, GBA Norte",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Vicente López",
-      "addressNeighborhood": "Florida",
-      "rooms": 4,
-      "bathrooms": 2,
-      "parking": 1,
-      "areaCoveredM2": 160,
-      "areaTotalM2": 320,
-      "amenities": ["jardin", "pileta", "cochera"],
-      "images": [
-        {"url": "https://placehold.co/800x500/png?text=ZP-VL-1", "order": 0},
-        {"url": "https://placehold.co/800x500/png?text=ZP-VL-2", "order": 1}
-      ]
-    },
-    {
-      "externalId": "zp-1002",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-refaccionar-1002.html",
-      "title": "Casa a refaccionar en San Isidro",
-      "description": "Propiedad con potencial, requiere obra en baños. Humedad en planta baja.",
-      "priceAmount": 190000,
-      "priceCurrency": "USD",
-      "addressRaw": "San Isidro",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "San Isidro",
-      "rooms": 3,
-      "bathrooms": 1,
-      "parking": 0,
-      "areaCoveredM2": 110,
-      "areaTotalM2": 200,
-      "amenities": [],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ZP-SI", "order": 0}]
-    },
-    {
-      "externalId": "zp-1101",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-gonnet-1101.html",
+      "externalId": "zp-2000",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2000.html",
       "title": "Casa 3 ambientes en Manuel B. Gonnet",
-      "description": "Casa familiar con jardín y pileta en Gonnet.",
-      "priceAmount": 138000,
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 128000,
       "priceCurrency": "USD",
       "addressRaw": "Manuel B. Gonnet, La Plata",
       "addressProvince": "Buenos Aires",
       "addressLocality": "Gonnet",
       "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8805,
+      "geoLng": -58.0178,
       "rooms": 3,
       "bathrooms": 2,
       "parking": 1,
-      "areaCoveredM2": 120,
-      "areaTotalM2": 280,
-      "amenities": ["jardin", "pileta", "cochera"],
+      "areaCoveredM2": 115,
+      "areaTotalM2": 260,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
       "images": [
-        {"url": "https://placehold.co/800x500/png?text=ZP-Gonnet-1", "order": 0},
-        {"url": "https://placehold.co/800x500/png?text=ZP-Gonnet-1b", "order": 1}
-      ]
+        {
+          "url": "https://picsum.photos/seed/zp2000/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2000b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "zp-1102",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-gonnet-1102.html",
-      "title": "Chalet 4 ambientes Gonnet",
-      "description": "Buen estado, quincho y jardín amplio.",
-      "priceAmount": 149000,
+      "externalId": "zp-2001",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2001.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 139500,
       "priceCurrency": "USD",
-      "addressRaw": "Gonnet, La Plata",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
       "addressProvince": "Buenos Aires",
       "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.880199999999995,
+      "geoLng": -58.0176,
       "rooms": 4,
       "bathrooms": 2,
       "parking": 1,
-      "areaCoveredM2": 145,
-      "areaTotalM2": 350,
-      "amenities": ["jardin", "quincho", "parrilla"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ZP-Gonnet-2", "order": 0}]
-    },
-    {
-      "externalId": "zp-1201",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-pilar-1201.html",
-      "title": "Casa en Pilar GBA Norte",
-      "description": "Casa en barrio cerrado con seguridad.",
-      "priceAmount": 142000,
-      "priceCurrency": "USD",
-      "addressRaw": "Pilar, Buenos Aires",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Pilar",
-      "rooms": 3,
-      "bathrooms": 2,
-      "parking": 2,
-      "areaCoveredM2": 130,
-      "areaTotalM2": 400,
-      "amenities": ["jardin", "seguridad", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ZP-Pilar", "order": 0}]
-    },
-    {
-      "externalId": "zp-1301",
-      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-moron-1301.html",
-      "title": "Casa 2 ambientes Morón",
-      "description": "Ideal pareja. Patio pequeño.",
-      "priceAmount": 98000,
-      "priceCurrency": "USD",
-      "addressRaw": "Morón, Buenos Aires",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Morón",
-      "rooms": 2,
-      "bathrooms": 1,
-      "parking": 0,
-      "areaCoveredM2": 70,
-      "areaTotalM2": 120,
-      "amenities": ["jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ZP-Moron", "order": 0}]
-    }
-  ],
-  "argenprop": [
-    {
-      "externalId": "ap-2001",
-      "sourceUrl": "https://www.argenprop.com/casa-en-venta-tigre-2001",
-      "title": "Casa en Tigre con cochera",
-      "description": "Casa a estrenar en barrio cerrado.",
-      "priceAmount": 310000,
-      "priceCurrency": "USD",
-      "addressRaw": "Tigre, Buenos Aires",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Tigre",
-      "rooms": 5,
-      "bathrooms": 3,
-      "parking": 2,
-      "areaCoveredM2": 220,
-      "areaTotalM2": 500,
-      "amenities": ["seguridad", "jardin", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=AP-Tigre", "order": 0}]
-    },
-    {
-      "externalId": "ap-2101",
-      "sourceUrl": "https://www.argenprop.com/casa-city-bell-2101",
-      "title": "Casa City Bell 4 ambientes",
-      "description": "Lote amplio con parque y pileta.",
-      "priceAmount": 147000,
-      "priceCurrency": "USD",
-      "addressRaw": "City Bell, La Plata",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "City Bell",
-      "rooms": 4,
-      "bathrooms": 2,
-      "parking": 1,
-      "areaCoveredM2": 150,
-      "areaTotalM2": 420,
-      "amenities": ["jardin", "pileta"],
+      "areaCoveredM2": 140,
+      "areaTotalM2": 320,
+      "amenities": [
+        "jardin",
+        "quincho"
+      ],
       "images": [
-        {"url": "https://placehold.co/800x500/png?text=AP-CityBell", "order": 0},
-        {"url": "https://placehold.co/800x500/png?text=AP-CityBell-2", "order": 1}
-      ]
+        {
+          "url": "https://picsum.photos/seed/zp2001/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2001b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "ap-2102",
-      "sourceUrl": "https://www.argenprop.com/casa-gonnet-2102",
-      "title": "Duplex Gonnet cerca calle 503",
-      "description": "Dos plantas, jardín frontal.",
-      "priceAmount": 125000,
-      "priceCurrency": "USD",
-      "addressRaw": "Manuel Belgrano Gonnet, La Plata",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Gonnet",
-      "rooms": 3,
-      "bathrooms": 2,
-      "parking": 1,
-      "areaCoveredM2": 105,
-      "areaTotalM2": 220,
-      "amenities": ["jardin", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=AP-Gonnet", "order": 0}]
-    },
-    {
-      "externalId": "ap-2201",
-      "sourceUrl": "https://www.argenprop.com/casa-escobar-2201",
-      "title": "Casa Escobar 3 ambientes",
-      "description": "Buena ubicación, pileta.",
-      "priceAmount": 132000,
-      "priceCurrency": "USD",
-      "addressRaw": "Escobar, Buenos Aires",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Escobar",
-      "rooms": 3,
-      "bathrooms": 1,
-      "parking": 1,
-      "areaCoveredM2": 100,
-      "areaTotalM2": 300,
-      "amenities": ["pileta", "jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=AP-Escobar", "order": 0}]
-    }
-  ],
-  "mercadolibre": [
-    {
-      "externalId": "ml-3001",
-      "sourceUrl": "https://inmuebles.mercadolibre.com.ar/MLA-3001",
-      "title": "Casa 3 ambientes Pilar",
-      "description": "Buena ubicación. Sin escritura, boleto.",
-      "priceAmount": 145000,
-      "priceCurrency": "USD",
-      "addressRaw": "Pilar",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Pilar",
-      "rooms": 3,
-      "bathrooms": 2,
-      "parking": 1,
-      "areaCoveredM2": 95,
-      "areaTotalM2": 250,
-      "amenities": ["jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ML-Pilar", "order": 0}]
-    },
-    {
-      "externalId": "ml-3101",
-      "sourceUrl": "https://inmuebles.mercadolibre.com.ar/MLA-3101",
-      "title": "Casa en Gonnet 3 amb",
-      "description": "Reciclada, jardín y parrilla.",
+      "externalId": "zp-2002",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2002.html",
+      "title": "Casa a refaccionar 3 ambientes en Manuel B. Gonnet",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
       "priceAmount": 119000,
       "priceCurrency": "USD",
       "addressRaw": "Manuel B. Gonnet, La Plata",
       "addressProvince": "Buenos Aires",
       "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8799,
+      "geoLng": -58.0174,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 98,
+      "areaTotalM2": 220,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2002/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2002b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "zp-2003",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2003.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 147000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.879599999999996,
+      "geoLng": -58.0172,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 155,
+      "areaTotalM2": 380,
+      "amenities": [
+        "jardin",
+        "pileta",
+        "cochera"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2003/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2003b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "zp-2004",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2004.html",
+      "title": "Casa 2 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 134000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8793,
+      "geoLng": -58.017,
+      "rooms": 2,
+      "bathrooms": 1,
+      "parking": 1,
+      "areaCoveredM2": 85,
+      "areaTotalM2": 180,
+      "amenities": [
+        "patio"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2004/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2004b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "zp-2005",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2005.html",
+      "title": "Chalet 3 ambientes City Bell",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 155000,
+      "priceCurrency": "USD",
+      "addressRaw": "City Bell, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "City Bell",
+      "addressNeighborhood": "City Bell",
+      "geoLat": -34.867399999999996,
+      "geoLng": -58.0446,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 125,
+      "areaTotalM2": 300,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2005/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2005b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "zp-2006",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2006.html",
+      "title": "Casa 3 ambientes La Plata",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 98000,
+      "priceCurrency": "USD",
+      "addressRaw": "Centro, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "La Plata",
+      "addressNeighborhood": "Centro",
+      "geoLat": -34.919599999999996,
+      "geoLng": -57.9532,
       "rooms": 3,
       "bathrooms": 1,
       "parking": 0,
       "areaCoveredM2": 90,
-      "areaTotalM2": 200,
-      "amenities": ["jardin", "parrilla"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ML-Gonnet", "order": 0}]
+      "areaTotalM2": 150,
+      "amenities": [],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2006/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2006b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "ml-3102",
-      "sourceUrl": "https://inmuebles.mercadolibre.com.ar/MLA-3102",
-      "title": "Casa La Plata centro",
-      "description": "Cercana a facultades. Cochera.",
-      "priceAmount": 128000,
+      "externalId": "zp-2007",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2007.html",
+      "title": "Casa 4 ambientes en Pilar",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 168000,
       "priceCurrency": "USD",
-      "addressRaw": "La Plata centro",
+      "addressRaw": "Pilar Centro, Pilar",
       "addressProvince": "Buenos Aires",
-      "addressLocality": "La Plata",
+      "addressLocality": "Pilar",
+      "addressNeighborhood": "Pilar Centro",
+      "geoLat": -34.4566,
+      "geoLng": -58.912800000000004,
       "rooms": 4,
       "bathrooms": 2,
-      "parking": 1,
-      "areaCoveredM2": 140,
-      "areaTotalM2": 180,
-      "amenities": ["cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ML-LaPlata", "order": 0}]
+      "parking": 2,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 450,
+      "amenities": [
+        "jardin",
+        "seguridad"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2007/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2007b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "ml-3201",
-      "sourceUrl": "https://inmuebles.mercadolibre.com.ar/MLA-3201",
-      "title": "Casa compacta Quilmes",
-      "description": "Lista para vivir.",
-      "priceAmount": 105000,
-      "priceCurrency": "USD",
-      "addressRaw": "Quilmes, Buenos Aires",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Quilmes",
-      "rooms": 2,
-      "bathrooms": 1,
-      "parking": 0,
-      "areaCoveredM2": 65,
-      "areaTotalM2": 90,
-      "amenities": [],
-      "images": [{"url": "https://placehold.co/800x500/png?text=ML-Quilmes", "order": 0}]
-    }
-  ],
-  "remax": [
-    {
-      "externalId": "rx-4001",
-      "sourceUrl": "https://www.remax.com.ar/listings/4001",
-      "title": "Casa Remax Olivos",
-      "description": "Casa familiar con jardín.",
-      "priceAmount": 420000,
+      "externalId": "zp-2008",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2008.html",
+      "title": "Casa 4 ambientes Vicente López",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 275000,
       "priceCurrency": "USD",
       "addressRaw": "Olivos, Vicente López",
       "addressProvince": "Buenos Aires",
       "addressLocality": "Vicente López",
       "addressNeighborhood": "Olivos",
+      "geoLat": -34.5051,
+      "geoLng": -58.4803,
       "rooms": 4,
-      "bathrooms": 3,
-      "parking": 2,
-      "areaCoveredM2": 200,
-      "areaTotalM2": 400,
-      "amenities": ["jardin", "parrilla", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=RX-Olivos", "order": 0}],
-      "agentName": "Remax Agent"
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 170,
+      "areaTotalM2": 280,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2008/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2008b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "rx-4101",
-      "sourceUrl": "https://www.remax.com.ar/listings/4101",
-      "title": "Casa Tigre accesible",
-      "description": "Cerca del río, jardín.",
-      "priceAmount": 135000,
+      "externalId": "zp-2009",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2009.html",
+      "title": "Casa a refaccionar 3 ambientes San Isidro",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 210000,
       "priceCurrency": "USD",
-      "addressRaw": "Tigre, GBA Norte",
+      "addressRaw": "Beccar, San Isidro",
       "addressProvince": "Buenos Aires",
-      "addressLocality": "Tigre",
+      "addressLocality": "San Isidro",
+      "addressNeighborhood": "Beccar",
+      "geoLat": -34.4701,
+      "geoLng": -58.5269,
       "rooms": 3,
       "bathrooms": 2,
       "parking": 1,
-      "areaCoveredM2": 110,
-      "areaTotalM2": 260,
-      "amenities": ["jardin", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=RX-Tigre", "order": 0}]
+      "areaCoveredM2": 130,
+      "areaTotalM2": 240,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2009/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2009b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
     },
     {
-      "externalId": "rx-4102",
-      "sourceUrl": "https://www.remax.com.ar/listings/4102",
-      "title": "Casa Gonnet sin ambientes tipificados",
-      "description": "Consulta amb. Jardín trasero.",
-      "priceAmount": 140000,
+      "externalId": "zp-2010",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2010.html",
+      "title": "Casa 3 ambientes Tigre",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 189000,
       "priceCurrency": "USD",
-      "addressRaw": "Gonnet, La Plata",
+      "addressRaw": "Tigre Centro, Tigre",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "addressNeighborhood": "Tigre Centro",
+      "geoLat": -34.4229,
+      "geoLng": -58.5776,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 120,
+      "areaTotalM2": 200,
+      "amenities": [
+        "jardin",
+        "muelle"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2010/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2010b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "zp-2011",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/zp-2011.html",
+      "title": "Casa 4 ambientes Belgrano",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 320000,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano R, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "addressNeighborhood": "Belgrano R",
+      "geoLat": -34.5594,
+      "geoLng": -58.454299999999996,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 180,
+      "areaTotalM2": 220,
+      "amenities": [
+        "terraza"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/zp2011/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/zp2011b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ZP",
+      "agentPhone": null
+    }
+  ],
+  "argenprop": [
+    {
+      "externalId": "ap-2000",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2000.html",
+      "title": "Casa 3 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 128000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
       "addressProvince": "Buenos Aires",
       "addressLocality": "Gonnet",
-      "rooms": null,
-      "bathrooms": 1,
-      "parking": 0,
-      "areaCoveredM2": 85,
-      "areaTotalM2": 190,
-      "amenities": ["jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=RX-Gonnet-nullrooms", "order": 0}]
-    },
-    {
-      "externalId": "rx-4201",
-      "sourceUrl": "https://www.remax.com.ar/listings/4201",
-      "title": "Casa Hurlingham 3 amb",
-      "description": "Pileta y quincho.",
-      "priceAmount": 118000,
-      "priceCurrency": "USD",
-      "addressRaw": "Hurlingham",
-      "addressProvince": "Buenos Aires",
-      "addressLocality": "Hurlingham",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8805,
+      "geoLng": -58.0178,
       "rooms": 3,
       "bathrooms": 2,
       "parking": 1,
       "areaCoveredM2": 115,
-      "areaTotalM2": 270,
-      "amenities": ["pileta", "quincho", "jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=RX-Hurlingham", "order": 0}]
-    }
-  ],
-  "century21": [
-    {
-      "externalId": "c21-5001",
-      "sourceUrl": "https://century21.com.ar/propiedad/5001",
-      "title": "Casa C21 Belgrano R",
-      "description": "Excelente casa en zona residencial.",
-      "priceAmount": 520000,
-      "priceCurrency": "USD",
-      "addressRaw": "Belgrano, CABA",
-      "addressProvince": "CABA",
-      "addressLocality": "Belgrano",
-      "rooms": 5,
-      "bathrooms": 3,
-      "parking": 1,
-      "areaCoveredM2": 240,
-      "areaTotalM2": 280,
-      "amenities": ["pileta"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=C21-Belgrano", "order": 0}]
+      "areaTotalM2": 260,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2000/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2000b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
     },
     {
-      "externalId": "c21-5101",
-      "sourceUrl": "https://century21.com.ar/propiedad/5101",
-      "title": "Casa C21 San Isidro bajo 150k",
-      "description": "Oportunidad con jardín.",
-      "priceAmount": 148500,
+      "externalId": "ap-2001",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2001.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 139800,
       "priceCurrency": "USD",
-      "addressRaw": "San Isidro, Buenos Aires",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
       "addressProvince": "Buenos Aires",
-      "addressLocality": "San Isidro",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.880199999999995,
+      "geoLng": -58.0176,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 140,
+      "areaTotalM2": 320,
+      "amenities": [
+        "jardin",
+        "quincho"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2001/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2001b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2002",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2002.html",
+      "title": "Casa a refaccionar 3 ambientes en Manuel B. Gonnet",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 119600,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8799,
+      "geoLng": -58.0174,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 98,
+      "areaTotalM2": 220,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2002/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2002b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2003",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2003.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 147900,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.879599999999996,
+      "geoLng": -58.0172,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 155,
+      "areaTotalM2": 380,
+      "amenities": [
+        "jardin",
+        "pileta",
+        "cochera"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2003/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2003b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2004",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2004.html",
+      "title": "Casa 2 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 135200,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8793,
+      "geoLng": -58.017,
+      "rooms": 2,
+      "bathrooms": 1,
+      "parking": 1,
+      "areaCoveredM2": 85,
+      "areaTotalM2": 180,
+      "amenities": [
+        "patio"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2004/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2004b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2005",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2005.html",
+      "title": "Chalet 3 ambientes City Bell",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 156500,
+      "priceCurrency": "USD",
+      "addressRaw": "City Bell, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "City Bell",
+      "addressNeighborhood": "City Bell",
+      "geoLat": -34.867399999999996,
+      "geoLng": -58.0446,
       "rooms": 3,
       "bathrooms": 2,
       "parking": 1,
       "areaCoveredM2": 125,
-      "areaTotalM2": 240,
-      "amenities": ["jardin", "cochera"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=C21-SI", "order": 0}]
+      "areaTotalM2": 300,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2005/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2005b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
     },
     {
-      "externalId": "c21-5102",
-      "sourceUrl": "https://century21.com.ar/propiedad/5102",
-      "title": "Casa C21 Vicente López económica",
-      "description": "3 ambientes con patio.",
-      "priceAmount": 112000,
+      "externalId": "ap-2006",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2006.html",
+      "title": "Casa 3 ambientes La Plata",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 99800,
       "priceCurrency": "USD",
-      "addressRaw": "Vicente López",
+      "addressRaw": "Centro, La Plata",
       "addressProvince": "Buenos Aires",
-      "addressLocality": "Vicente López",
+      "addressLocality": "La Plata",
+      "addressNeighborhood": "Centro",
+      "geoLat": -34.919599999999996,
+      "geoLng": -57.9532,
       "rooms": 3,
       "bathrooms": 1,
       "parking": 0,
-      "areaCoveredM2": 95,
+      "areaCoveredM2": 90,
       "areaTotalM2": 150,
-      "amenities": ["jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=C21-VL", "order": 0}]
+      "amenities": [],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2006/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2006b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
     },
     {
-      "externalId": "c21-5103",
-      "sourceUrl": "https://century21.com.ar/propiedad/5103",
-      "title": "Casa C21 Lomas de Zamora",
-      "description": "Pileta y jardín.",
-      "priceAmount": 139000,
+      "externalId": "ap-2007",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2007.html",
+      "title": "Casa 4 ambientes en Pilar",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 170100,
       "priceCurrency": "USD",
-      "addressRaw": "Lomas de Zamora",
+      "addressRaw": "Pilar Centro, Pilar",
       "addressProvince": "Buenos Aires",
-      "addressLocality": "Lomas de Zamora",
+      "addressLocality": "Pilar",
+      "addressNeighborhood": "Pilar Centro",
+      "geoLat": -34.4566,
+      "geoLng": -58.912800000000004,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 2,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 450,
+      "amenities": [
+        "jardin",
+        "seguridad"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2007/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2007b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2008",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2008.html",
+      "title": "Casa 4 ambientes Vicente López",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 277400,
+      "priceCurrency": "USD",
+      "addressRaw": "Olivos, Vicente López",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Olivos",
+      "geoLat": -34.5051,
+      "geoLng": -58.4803,
       "rooms": 4,
       "bathrooms": 2,
       "parking": 1,
+      "areaCoveredM2": 170,
+      "areaTotalM2": 280,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2008/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2008b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2009",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2009.html",
+      "title": "Casa a refaccionar 3 ambientes San Isidro",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 212700,
+      "priceCurrency": "USD",
+      "addressRaw": "Beccar, San Isidro",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "San Isidro",
+      "addressNeighborhood": "Beccar",
+      "geoLat": -34.4701,
+      "geoLng": -58.5269,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 130,
+      "areaTotalM2": 240,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2009/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2009b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2010",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2010.html",
+      "title": "Casa 3 ambientes Tigre",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 192000,
+      "priceCurrency": "USD",
+      "addressRaw": "Tigre Centro, Tigre",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "addressNeighborhood": "Tigre Centro",
+      "geoLat": -34.4229,
+      "geoLng": -58.5776,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 120,
+      "areaTotalM2": 200,
+      "amenities": [
+        "jardin",
+        "muelle"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2010/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2010b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ap-2011",
+      "sourceUrl": "https://www.argenprop.com/casa/ap-2011.html",
+      "title": "Casa 4 ambientes Belgrano",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 323300,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano R, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "addressNeighborhood": "Belgrano R",
+      "geoLat": -34.5594,
+      "geoLng": -58.454299999999996,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 180,
+      "areaTotalM2": 220,
+      "amenities": [
+        "terraza"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ap2011/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ap2011b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente AP",
+      "agentPhone": null
+    }
+  ],
+  "mercadolibre": [
+    {
+      "externalId": "ml-2000",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2000.html",
+      "title": "Casa 3 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 130000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8805,
+      "geoLng": -58.0178,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 115,
+      "areaTotalM2": 260,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2000/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2000b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2001",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2001.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 141800,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.880199999999995,
+      "geoLng": -58.0176,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 140,
+      "areaTotalM2": 320,
+      "amenities": [
+        "jardin",
+        "quincho"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2001/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2001b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2002",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2002.html",
+      "title": "Casa a refaccionar 3 ambientes en Manuel B. Gonnet",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 121600,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8799,
+      "geoLng": -58.0174,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 98,
+      "areaTotalM2": 220,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2002/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2002b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2003",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2003.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 149900,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.879599999999996,
+      "geoLng": -58.0172,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
       "areaCoveredM2": 155,
-      "areaTotalM2": 310,
-      "amenities": ["pileta", "jardin"],
-      "images": [{"url": "https://placehold.co/800x500/png?text=C21-Lomas", "order": 0}]
+      "areaTotalM2": 380,
+      "amenities": [
+        "jardin",
+        "pileta",
+        "cochera"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2003/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2003b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2004",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2004.html",
+      "title": "Casa 2 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 137200,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8793,
+      "geoLng": -58.017,
+      "rooms": 2,
+      "bathrooms": 1,
+      "parking": 1,
+      "areaCoveredM2": 85,
+      "areaTotalM2": 180,
+      "amenities": [
+        "patio"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2004/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2004b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2005",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2005.html",
+      "title": "Chalet 3 ambientes City Bell",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 158500,
+      "priceCurrency": "USD",
+      "addressRaw": "City Bell, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "City Bell",
+      "addressNeighborhood": "City Bell",
+      "geoLat": -34.867399999999996,
+      "geoLng": -58.0446,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 125,
+      "areaTotalM2": 300,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2005/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2005b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2006",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2006.html",
+      "title": "Casa 3 ambientes La Plata",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 101800,
+      "priceCurrency": "USD",
+      "addressRaw": "Centro, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "La Plata",
+      "addressNeighborhood": "Centro",
+      "geoLat": -34.919599999999996,
+      "geoLng": -57.9532,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 90,
+      "areaTotalM2": 150,
+      "amenities": [],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2006/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2006b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2007",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2007.html",
+      "title": "Casa 4 ambientes en Pilar",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 172100,
+      "priceCurrency": "USD",
+      "addressRaw": "Pilar Centro, Pilar",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Pilar",
+      "addressNeighborhood": "Pilar Centro",
+      "geoLat": -34.4566,
+      "geoLng": -58.912800000000004,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 2,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 450,
+      "amenities": [
+        "jardin",
+        "seguridad"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2007/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2007b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2008",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2008.html",
+      "title": "Casa 4 ambientes Vicente López",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 279400,
+      "priceCurrency": "USD",
+      "addressRaw": "Olivos, Vicente López",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Olivos",
+      "geoLat": -34.5051,
+      "geoLng": -58.4803,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 170,
+      "areaTotalM2": 280,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2008/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2008b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2009",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2009.html",
+      "title": "Casa a refaccionar 3 ambientes San Isidro",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 214700,
+      "priceCurrency": "USD",
+      "addressRaw": "Beccar, San Isidro",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "San Isidro",
+      "addressNeighborhood": "Beccar",
+      "geoLat": -34.4701,
+      "geoLng": -58.5269,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 130,
+      "areaTotalM2": 240,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2009/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2009b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2010",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2010.html",
+      "title": "Casa 3 ambientes Tigre",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 194000,
+      "priceCurrency": "USD",
+      "addressRaw": "Tigre Centro, Tigre",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "addressNeighborhood": "Tigre Centro",
+      "geoLat": -34.4229,
+      "geoLng": -58.5776,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 120,
+      "areaTotalM2": 200,
+      "amenities": [
+        "jardin",
+        "muelle"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2010/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2010b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    },
+    {
+      "externalId": "ml-2011",
+      "sourceUrl": "https://casa.mercadolibre.com.ar/ml-2011.html",
+      "title": "Casa 4 ambientes Belgrano",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 325300,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano R, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "addressNeighborhood": "Belgrano R",
+      "geoLat": -34.5594,
+      "geoLng": -58.454299999999996,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 180,
+      "areaTotalM2": 220,
+      "amenities": [
+        "terraza"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/ml2011/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/ml2011b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente ML",
+      "agentPhone": null
+    }
+  ],
+  "remax": [
+    {
+      "externalId": "rx-2000",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2000.html",
+      "title": "Casa 3 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 130000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8805,
+      "geoLng": -58.0178,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 115,
+      "areaTotalM2": 260,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2000/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2000b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2001",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2001.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 141800,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.880199999999995,
+      "geoLng": -58.0176,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 140,
+      "areaTotalM2": 320,
+      "amenities": [
+        "jardin",
+        "quincho"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2001/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2001b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2002",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2002.html",
+      "title": "Casa a refaccionar 3 ambientes en Manuel B. Gonnet",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 121600,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8799,
+      "geoLng": -58.0174,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 98,
+      "areaTotalM2": 220,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2002/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2002b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2003",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2003.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 149900,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.879599999999996,
+      "geoLng": -58.0172,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 155,
+      "areaTotalM2": 380,
+      "amenities": [
+        "jardin",
+        "pileta",
+        "cochera"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2003/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2003b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2004",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2004.html",
+      "title": "Casa 2 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 137200,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8793,
+      "geoLng": -58.017,
+      "rooms": 2,
+      "bathrooms": 1,
+      "parking": 1,
+      "areaCoveredM2": 85,
+      "areaTotalM2": 180,
+      "amenities": [
+        "patio"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2004/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2004b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2005",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2005.html",
+      "title": "Chalet 3 ambientes City Bell",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 158500,
+      "priceCurrency": "USD",
+      "addressRaw": "City Bell, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "City Bell",
+      "addressNeighborhood": "City Bell",
+      "geoLat": -34.867399999999996,
+      "geoLng": -58.0446,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 125,
+      "areaTotalM2": 300,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2005/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2005b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2006",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2006.html",
+      "title": "Casa 3 ambientes La Plata",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 101800,
+      "priceCurrency": "USD",
+      "addressRaw": "Centro, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "La Plata",
+      "addressNeighborhood": "Centro",
+      "geoLat": -34.919599999999996,
+      "geoLng": -57.9532,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 90,
+      "areaTotalM2": 150,
+      "amenities": [],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2006/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2006b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2007",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2007.html",
+      "title": "Casa 4 ambientes en Pilar",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 172100,
+      "priceCurrency": "USD",
+      "addressRaw": "Pilar Centro, Pilar",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Pilar",
+      "addressNeighborhood": "Pilar Centro",
+      "geoLat": -34.4566,
+      "geoLng": -58.912800000000004,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 2,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 450,
+      "amenities": [
+        "jardin",
+        "seguridad"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2007/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2007b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2008",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2008.html",
+      "title": "Casa 4 ambientes Vicente López",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 279400,
+      "priceCurrency": "USD",
+      "addressRaw": "Olivos, Vicente López",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Olivos",
+      "geoLat": -34.5051,
+      "geoLng": -58.4803,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 170,
+      "areaTotalM2": 280,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2008/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2008b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2009",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2009.html",
+      "title": "Casa a refaccionar 3 ambientes San Isidro",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 214700,
+      "priceCurrency": "USD",
+      "addressRaw": "Beccar, San Isidro",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "San Isidro",
+      "addressNeighborhood": "Beccar",
+      "geoLat": -34.4701,
+      "geoLng": -58.5269,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 130,
+      "areaTotalM2": 240,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2009/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2009b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2010",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2010.html",
+      "title": "Casa 3 ambientes Tigre",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 194000,
+      "priceCurrency": "USD",
+      "addressRaw": "Tigre Centro, Tigre",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "addressNeighborhood": "Tigre Centro",
+      "geoLat": -34.4229,
+      "geoLng": -58.5776,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 120,
+      "areaTotalM2": 200,
+      "amenities": [
+        "jardin",
+        "muelle"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2010/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2010b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    },
+    {
+      "externalId": "rx-2011",
+      "sourceUrl": "https://www.remax.com.ar/listings/rx-2011.html",
+      "title": "Casa 4 ambientes Belgrano",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 325300,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano R, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "addressNeighborhood": "Belgrano R",
+      "geoLat": -34.5594,
+      "geoLng": -58.454299999999996,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 180,
+      "areaTotalM2": 220,
+      "amenities": [
+        "terraza"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/rx2011/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/rx2011b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente RX",
+      "agentPhone": null
+    }
+  ],
+  "century21": [
+    {
+      "externalId": "c21-2000",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2000.html",
+      "title": "Casa 3 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 130000,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8805,
+      "geoLng": -58.0178,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 115,
+      "areaTotalM2": 260,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212000/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212000b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2001",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2001.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 141800,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.880199999999995,
+      "geoLng": -58.0176,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 140,
+      "areaTotalM2": 320,
+      "amenities": [
+        "jardin",
+        "quincho"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212001/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212001b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2002",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2002.html",
+      "title": "Casa a refaccionar 3 ambientes en Manuel B. Gonnet",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 121600,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8799,
+      "geoLng": -58.0174,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 98,
+      "areaTotalM2": 220,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212002/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212002b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2003",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2003.html",
+      "title": "Casa 4 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 149900,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.879599999999996,
+      "geoLng": -58.0172,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 155,
+      "areaTotalM2": 380,
+      "amenities": [
+        "jardin",
+        "pileta",
+        "cochera"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212003/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212003b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2004",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2004.html",
+      "title": "Casa 2 ambientes en Manuel B. Gonnet",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 137200,
+      "priceCurrency": "USD",
+      "addressRaw": "Manuel B. Gonnet, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Gonnet",
+      "addressNeighborhood": "Manuel B. Gonnet",
+      "geoLat": -34.8793,
+      "geoLng": -58.017,
+      "rooms": 2,
+      "bathrooms": 1,
+      "parking": 1,
+      "areaCoveredM2": 85,
+      "areaTotalM2": 180,
+      "amenities": [
+        "patio"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212004/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212004b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2005",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2005.html",
+      "title": "Chalet 3 ambientes City Bell",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 158500,
+      "priceCurrency": "USD",
+      "addressRaw": "City Bell, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "City Bell",
+      "addressNeighborhood": "City Bell",
+      "geoLat": -34.867399999999996,
+      "geoLng": -58.0446,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 125,
+      "areaTotalM2": 300,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212005/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212005b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2006",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2006.html",
+      "title": "Casa 3 ambientes La Plata",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 101800,
+      "priceCurrency": "USD",
+      "addressRaw": "Centro, La Plata",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "La Plata",
+      "addressNeighborhood": "Centro",
+      "geoLat": -34.919599999999996,
+      "geoLng": -57.9532,
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 90,
+      "areaTotalM2": 150,
+      "amenities": [],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212006/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212006b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2007",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2007.html",
+      "title": "Casa 4 ambientes en Pilar",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 172100,
+      "priceCurrency": "USD",
+      "addressRaw": "Pilar Centro, Pilar",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Pilar",
+      "addressNeighborhood": "Pilar Centro",
+      "geoLat": -34.4566,
+      "geoLng": -58.912800000000004,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 2,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 450,
+      "amenities": [
+        "jardin",
+        "seguridad"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212007/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212007b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2008",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2008.html",
+      "title": "Casa 4 ambientes Vicente López",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 279400,
+      "priceCurrency": "USD",
+      "addressRaw": "Olivos, Vicente López",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Olivos",
+      "geoLat": -34.5051,
+      "geoLng": -58.4803,
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 170,
+      "areaTotalM2": 280,
+      "amenities": [
+        "jardin",
+        "pileta"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212008/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212008b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2009",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2009.html",
+      "title": "Casa a refaccionar 3 ambientes San Isidro",
+      "description": "Propiedad con potencial a refaccionar. Requiere obra en baños y hay humedad en planta baja. La estructura está sana según visita ocular, pero conviene peritaje técnico. Lote amplio con orientación favorable. Ideal para comprador que evaluate costo de obra vs precio de lista. Documentación a verificar en escribanía. No apta para quien busca listo para vivir sin intervención. Consultar estado real en visita presencial.",
+      "priceAmount": 214700,
+      "priceCurrency": "USD",
+      "addressRaw": "Beccar, San Isidro",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "San Isidro",
+      "addressNeighborhood": "Beccar",
+      "geoLat": -34.4701,
+      "geoLng": -58.5269,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 130,
+      "areaTotalM2": 240,
+      "amenities": [
+        "jardin"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212009/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212009b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2010",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2010.html",
+      "title": "Casa 3 ambientes Tigre",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 194000,
+      "priceCurrency": "USD",
+      "addressRaw": "Tigre Centro, Tigre",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "addressNeighborhood": "Tigre Centro",
+      "geoLat": -34.4229,
+      "geoLng": -58.5776,
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 120,
+      "areaTotalM2": 200,
+      "amenities": [
+        "jardin",
+        "muelle"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212010/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212010b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
+    },
+    {
+      "externalId": "c21-2011",
+      "sourceUrl": "https://century21.com.ar/propiedad/c21-2011.html",
+      "title": "Casa 4 ambientes Belgrano",
+      "description": "Casa familiar en excelente ubicación, lista para entrar a vivir. Living-comedor luminoso con ventanales al jardín, cocina integrada con amplitud para isla y office. Los dormitorios tienen placards empotrados; el suite principal suma vestidor y baño en suite. El jardín perimetral permite space para parrilla y area de juegos. Servicios a pocos minutos: comercio de cercanía, transporte público y accesos a avenidas principales. Escritura al día. Ideal para quienes buscan espacio, luz natural y un entorno residencial tranquilo sin resignar conectividad. Consultar financiamiento y horarios de visita.",
+      "priceAmount": 325300,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano R, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "addressNeighborhood": "Belgrano R",
+      "geoLat": -34.5594,
+      "geoLng": -58.454299999999996,
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 180,
+      "areaTotalM2": 220,
+      "amenities": [
+        "terraza"
+      ],
+      "images": [
+        {
+          "url": "https://picsum.photos/seed/c212011/800/500",
+          "order": 0,
+          "kind": "source"
+        },
+        {
+          "url": "https://picsum.photos/seed/c212011b/800/500",
+          "order": 1,
+          "kind": "source"
+        }
+      ],
+      "agentName": "Agente C21",
+      "agentPhone": null
     }
   ]
 }

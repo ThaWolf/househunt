@@ -61,17 +61,29 @@ class RawProperty:
 
 
 @dataclass
+class AdapterPaginationMeta:
+    pages_fetched: int = 0
+    listings_raw: int = 0
+    listings_after_filter: int = 0
+    max_pages: int = 3
+    page_size_hint: int = 20
+    mode: str | None = None  # fixtures | live | hybrid
+
+
+@dataclass
 class AdapterResult:
     portal: PortalId
     status: AdapterStatus
     items: list[RawProperty] = field(default_factory=list)
     unsupported_filters: list[str] = field(default_factory=list)
+    pagination: AdapterPaginationMeta | None = None
     error: AdapterError | None = None
 
 
 # Re-export for convenience
 __all__ = [
     "AdapterError",
+    "AdapterPaginationMeta",
     "AdapterResult",
     "RawProperty",
     "SearchFilters",

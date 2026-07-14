@@ -15,10 +15,12 @@ from app.adapters.types import AdapterResult, RawProperty
 from app.config import Settings, get_settings
 from app.db import models
 from app.mappers import apply_raw_to_row, interest_flags, property_to_dto, raw_property_to_model
-from app.schemas.common import AdapterStatus, PortalId
+from app.schemas.common import AdapterStatus, PortalId, SearchModeHint
 from app.schemas.property import (
+    AdapterPaginationMetaDTO,
     PortalSearchError,
     PortalSearchResult,
+    SearchDensity,
     SearchFilters,
     SearchResponse,
     SearchResultItem,
@@ -79,6 +81,26 @@ async def _visits_overlay(
     return {v.property_id: v for v in result.scalars().all()}
 
 
+def _pagination_dto(res: AdapterResult) -> AdapterPaginationMetaDTO | None:
+    if res.pagination is None:
+        return None
+    p = res.pagination
+    mode = None
+    if p.mode:
+        try:
+            mode = SearchModeHint(p.mode)
+        except ValueError:
+            mode = None
+    return AdapterPaginationMetaDTO(
+        pages_fetched=p.pages_fetched,
+        listings_raw=p.listings_raw,
+        listings_after_filter=p.listings_after_filter,
+        max_pages=p.max_pages,
+        page_size_hint=p.page_size_hint,
+        mode=mode,
+    )
+
+
 async def run_search(
     db: AsyncSession,
     *,
@@ -99,13 +121,21 @@ async def run_search(
                 run_adapter(portal, filters, settings=settings), timeout=timeout
             )
         except asyncio.TimeoutError:
-            from app.adapters.types import AdapterError
+            from app.adapters.types import AdapterError, AdapterPaginationMeta
             from app.schemas.common import AdapterErrorCode
 
             return AdapterResult(
                 portal=portal,
                 status=AdapterStatus.error,
                 items=[],
+                pagination=AdapterPaginationMeta(
+                    pages_fetched=0,
+                    listings_raw=0,
+                    listings_after_filter=0,
+                    max_pages=filters.max_pages or settings.adapter_max_pages,
+                    page_size_hint=filters.page_size_hint or settings.adapter_page_size_hint,
+                    mode="hybrid",
+                ),
                 error=AdapterError(
                     code=AdapterErrorCode.network,
                     message=f"Adapter timeout after {timeout}s",
@@ -118,6 +148,7 @@ async def run_search(
     portal_results: list[PortalSearchResult] = []
     merged_rows: list[models.Property] = []
     seen: set[tuple[str, str]] = set()
+    modes: list[str] = []
 
     for portal, res in zip(portals, results, strict=True):
         if isinstance(res, BaseException):
@@ -145,18 +176,19 @@ async def run_search(
                 message=res.error.message,
                 retryable=res.error.retryable,
             )
-        # When fixtures_only with items, surface as ok for FE (status already set)
         status = res.status
         if res.error and res.error.code.value == "fixtures_only" and res.items:
             status = AdapterStatus.ok
-            # Keep error info for meta debugging? Contract allows error on ok partial —
-            # leave error populated when fixtures_only for transparency
+        pag = _pagination_dto(res)
+        if pag and pag.mode:
+            modes.append(pag.mode.value)
         portal_results.append(
             PortalSearchResult(
                 portal=res.portal,
                 status=status,
                 count=len(res.items),
                 unsupported_filters=res.unsupported_filters,
+                pagination=pag,
                 error=err,
             )
         )
@@ -171,12 +203,15 @@ async def run_search(
     # Authoritative post-filter (geo / price / rooms) — fixtures included
     filtered_rows = filter_merged(merged_rows, filters)
 
-    # Recount portal slices after post-filter
+    # Recount portal slices after post-filter + sync pagination.listingsAfterFilter
     counts: dict[str, int] = {}
     for row in filtered_rows:
         counts[row.portal] = counts.get(row.portal, 0) + 1
     for pr in portal_results:
-        pr.count = counts.get(pr.portal.value, 0)
+        after = counts.get(pr.portal.value, 0)
+        pr.count = after
+        if pr.pagination is not None:
+            pr.pagination.listings_after_filter = after
 
     prop_ids = [r.id for r in filtered_rows]
     interests = await _interest_overlay(db, user_id, prop_ids)
@@ -200,11 +235,30 @@ async def run_search(
         data["interest"] = flags
         items.append(SearchResultItem.model_validate(data))
 
+    multi_page = sum(
+        1
+        for pr in portal_results
+        if pr.pagination and pr.pagination.pages_fetched >= 2
+    )
+    if settings.adapter_use_fixtures:
+        dens_mode = SearchModeHint.fixtures
+    elif "hybrid" in modes:
+        dens_mode = SearchModeHint.hybrid
+    elif "live" in modes:
+        dens_mode = SearchModeHint.live
+    else:
+        dens_mode = SearchModeHint.hybrid
+
     took_ms = int((time.perf_counter() - started) * 1000)
     return SearchResponse(
         search_id=search_id,
         filters=filters,
         items=items,
         portal_results=portal_results,
+        density=SearchDensity(
+            total_items=len(items),
+            portals_with_multi_page=multi_page,
+            mode=dens_mode,
+        ),
         took_ms=took_ms,
     )
