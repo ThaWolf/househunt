@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: househunt
+      POSTGRES_PASSWORD: househunt
+      POSTGRES_DB: househunt
+    ports:
+      - "5432:5432"
+    volumes:
+      - househunt_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U househunt -d househunt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      DATABASE_URL: postgresql+asyncpg://househunt:househunt@postgres:5432/househunt
+      JWT_SECRET: dev-compose-secret-change-me
+      JWT_ACCESS_TTL_MINUTES: "30"
+      JWT_REFRESH_TTL_DAYS: "14"
+      CORS_ORIGINS: http://localhost:5173
+      FRONTEND_URL: http://localhost:5173
+      ADAPTER_USE_FIXTURES: "true"
+      FEATURE_GOOGLE_CALENDAR: "false"
+      FEATURE_IMAGE_PROXY: "true"
+      FEATURE_POI: "false"
+      ENVIRONMENT: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  househunt_pg:

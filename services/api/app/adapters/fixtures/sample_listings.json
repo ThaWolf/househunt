@@ -1,0 +1,123 @@
+{
+  "zonaprop": [
+    {
+      "externalId": "zp-1001",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-vicente-lopez-1001.html",
+      "title": "Casa 4 ambientes en Vicente López",
+      "description": "Hermosa casa con jardín y pileta. Living luminoso.",
+      "priceAmount": 285000,
+      "priceCurrency": "USD",
+      "addressRaw": "Vicente López, GBA Norte",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Florida",
+      "rooms": 4,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 160,
+      "areaTotalM2": 320,
+      "amenities": ["jardin", "pileta"],
+      "images": [{"url": "https://placehold.co/600x400/png?text=ZP1", "order": 0}]
+    },
+    {
+      "externalId": "zp-1002",
+      "sourceUrl": "https://www.zonaprop.com.ar/propiedades/casa-refaccionar-1002.html",
+      "title": "Casa a refaccionar en San Isidro",
+      "description": "Propiedad con potencial, requiere obra en baños. Humedad en planta baja.",
+      "priceAmount": 190000,
+      "priceCurrency": "USD",
+      "addressRaw": "San Isidro",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "San Isidro",
+      "rooms": 3,
+      "bathrooms": 1,
+      "parking": 0,
+      "areaCoveredM2": 110,
+      "areaTotalM2": 200,
+      "amenities": [],
+      "images": [{"url": "https://placehold.co/600x400/png?text=ZP2", "order": 0}]
+    }
+  ],
+  "argenprop": [
+    {
+      "externalId": "ap-2001",
+      "sourceUrl": "https://www.argenprop.com/casa-en-venta-tigre-2001",
+      "title": "Casa en Tigre con cochera",
+      "description": "Casa a estrenar en barrio cerrado.",
+      "priceAmount": 310000,
+      "priceCurrency": "USD",
+      "addressRaw": "Tigre, Buenos Aires",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Tigre",
+      "rooms": 5,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 220,
+      "areaTotalM2": 500,
+      "amenities": ["seguridad", "jardin"],
+      "images": [{"url": "https://placehold.co/600x400/png?text=AP1", "order": 0}]
+    }
+  ],
+  "mercadolibre": [
+    {
+      "externalId": "ml-3001",
+      "sourceUrl": "https://inmuebles.mercadolibre.com.ar/MLA-3001",
+      "title": "Casa 3 ambientes Pilar",
+      "description": "Buena ubicación. Sin escritura, boleto.",
+      "priceAmount": 145000,
+      "priceCurrency": "USD",
+      "addressRaw": "Pilar",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Pilar",
+      "rooms": 3,
+      "bathrooms": 2,
+      "parking": 1,
+      "areaCoveredM2": 95,
+      "areaTotalM2": 250,
+      "amenities": ["jardin"],
+      "images": [{"url": "https://placehold.co/600x400/png?text=ML1", "order": 0}]
+    }
+  ],
+  "remax": [
+    {
+      "externalId": "rx-4001",
+      "sourceUrl": "https://www.remax.com.ar/listings/4001",
+      "title": "Casa Remax Olivos",
+      "description": "Casa familiar con jardín.",
+      "priceAmount": 420000,
+      "priceCurrency": "USD",
+      "addressRaw": "Olivos, Vicente López",
+      "addressProvince": "Buenos Aires",
+      "addressLocality": "Vicente López",
+      "addressNeighborhood": "Olivos",
+      "rooms": 4,
+      "bathrooms": 3,
+      "parking": 2,
+      "areaCoveredM2": 200,
+      "areaTotalM2": 400,
+      "amenities": ["jardin", "parrilla"],
+      "images": [{"url": "https://placehold.co/600x400/png?text=RX1", "order": 0}],
+      "agentName": "Remax Agent"
+    }
+  ],
+  "century21": [
+    {
+      "externalId": "c21-5001",
+      "sourceUrl": "https://century21.com.ar/propiedad/5001",
+      "title": "Casa C21 Belgrano R",
+      "description": "Excelente casa en zona residencial.",
+      "priceAmount": 520000,
+      "priceCurrency": "USD",
+      "addressRaw": "Belgrano, CABA",
+      "addressProvince": "CABA",
+      "addressLocality": "Belgrano",
+      "rooms": 5,
+      "bathrooms": 3,
+      "parking": 1,
+      "areaCoveredM2": 240,
+      "areaTotalM2": 280,
+      "amenities": ["pileta"],
+      "images": [{"url": "https://placehold.co/600x400/png?text=C21", "order": 0}]
+    }
+  ]
+}
