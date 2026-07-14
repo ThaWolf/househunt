@@ -2,7 +2,7 @@
 
 Personal house-hunting aggregator (Argentina) — Vite/React + FastAPI + Playwright adapters.
 
-Branch de factory: `factory/iter-004`.
+Branch de factory: `factory/iter-005`.
 
 ## Quick start (local)
 
@@ -70,6 +70,10 @@ pytest -q
 | `make test` | API pytest + web vitest |
 | `make web` | Vite dev server |
 | `make api` | uvicorn reload |
+| `make api-live` | uvicorn with `ADAPTER_USE_FIXTURES=false` (host live scrap; needs Chromium — see Live scrap above) |
+| `make qa-smoke` | run `scripts/qa_smoke_search.py` against a running API (QA gate) |
+
+QA smoke (iter-5 gate): with API up via `make api-live`, run `make qa-smoke`. Script: [`scripts/qa_smoke_search.py`](scripts/qa_smoke_search.py).
 
 ## CI
 
