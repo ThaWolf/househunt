@@ -2,7 +2,7 @@
 
 Personal house-hunting aggregator (Argentina) — Vite/React + FastAPI + Playwright adapters.
 
-Branch de factory: `factory/iter-001`.
+Branch de factory: `factory/iter-004`.
 
 ## Quick start (local)
 
@@ -22,6 +22,22 @@ make web
 
 Healthcheck: `GET /api/health`.
 
+Default adapters: `ADAPTER_USE_FIXTURES=false` (local-real). Set `true` only for offline demo with curated fixtures.
+
+### Live scrap (Playwright / Chromium)
+
+The Docker image stays slim and **does not** install Chromium (image size). For live portal scrap on the host API:
+
+```bash
+cd services/api
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python -m playwright install chromium
+# then: make -C ../.. api   (with Postgres up)
+```
+
+Compose with `ADAPTER_USE_FIXTURES=false` still expects a browser in-container — without a Chromium bake-in, use the host workflow above or temporarily set fixtures `true`. Railway notes: [docs/deploy-railway.md](docs/deploy-railway.md).
+
 ## Frontend
 
 [`apps/web`](apps/web) — Vite · React · TypeScript · Tailwind.
@@ -33,7 +49,7 @@ npm run build && npm test
 
 ## Backend
 
-[`services/api`](services/api) — FastAPI · Alembic · adapters ×5 (fixtures by default).
+[`services/api`](services/api) — FastAPI · Alembic · adapters ×5 (live scrap default; fixtures optional).
 
 ```bash
 cd services/api

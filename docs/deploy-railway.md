@@ -49,7 +49,7 @@ Set these on the **app** service (values from your local `secrets.local.env` / R
 | `FRONTEND_URL` | Prod: same public origin as the app (after domain) |
 | `CORS_ORIGINS` | Prod Opción A (same origin): empty or omit |
 | `ADAPTER_*_ENABLED` | Usually `true` for all five portals |
-| `ADAPTER_USE_FIXTURES` | `true` until live scrapers are stable |
+| `ADAPTER_USE_FIXTURES` | Prefer `false` for real scrap (live ZonaProp / ML). Use `true` only for offline demo once curated fixtures exist |
 | `FEATURE_GOOGLE_CALENDAR` | `false` until OAuth + calendar scopes ready |
 | `FEATURE_GOOGLE_MAPS` | `false` unless Maps is enabled |
 | `GOOGLE_MAPS_API_KEY` | Optional. Without it (or with `FEATURE_GOOGLE_MAPS=false`), UI/API must degrade — no crash, maps/POI maps features off |
@@ -59,6 +59,15 @@ Set these on the **app** service (values from your local `secrets.local.env` / R
 | `RAILWAY_PUBLIC_URL` | **Deferred** — set after you have a public domain |
 
 Do **not** put secrets in the frontend bundle. CI must not echo secret values.
+
+### Playwright / Chromium (live scrap)
+
+With `ADAPTER_USE_FIXTURES=false`, adapters need a Playwright Chromium browser. The default Opción A image **does not** bake Chromium (keeps the image lean). For Railway live scrap you must either:
+
+1. Extend the Dockerfile (or a custom image) with `python -m playwright install --with-deps chromium`, or
+2. Run scrap workers elsewhere and keep Railway on fixtures/`true` until that image exists.
+
+Local: host API + `python -m playwright install chromium` (see root README). Compose uses the same slim image — live scrap in-container needs the Chromium bake-in above.
 
 ## 5. Google OAuth redirects (localhost vs prod)
 

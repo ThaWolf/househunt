@@ -20,6 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY services/api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Runtime stays slim on purpose: Playwright Chromium (~100MB+ plus OS deps) is
+# NOT installed here. Live scrap (ADAPTER_USE_FIXTURES=false) should use a host
+# venv: `python -m playwright install chromium` — see README.
+# Optional bake-in later:
+#   RUN playwright install --with-deps chromium
 FROM python:3.12-slim AS runtime
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
