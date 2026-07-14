@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: househunt
       POSTGRES_DB: househunt
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - househunt_pg:/var/lib/postgresql/data
     healthcheck:
@@ -22,16 +22,19 @@ services:
       target: runtime
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       PORT: "8000"
+      # Compose network DB (overrides any host Railway URL in .env)
       DATABASE_URL: postgresql+asyncpg://househunt:househunt@postgres:5432/househunt
-      JWT_SECRET: dev-compose-secret-change-me
-      JWT_ACCESS_TTL_MINUTES: "30"
-      JWT_REFRESH_TTL_DAYS: "14"
       CORS_ORIGINS: http://localhost:5173
       FRONTEND_URL: http://localhost:5173
       ADAPTER_USE_FIXTURES: "true"
       FEATURE_GOOGLE_CALENDAR: "false"
+      FEATURE_GOOGLE_MAPS: "false"
+      # Optional: host/.env substitution; empty = degrade (env_file also loads .env)
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
       FEATURE_IMAGE_PROXY: "true"
       FEATURE_POI: "false"
       ENVIRONMENT: development

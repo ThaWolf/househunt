@@ -51,6 +51,8 @@ Set these on the **app** service (values from your local `secrets.local.env` / R
 | `ADAPTER_*_ENABLED` | Usually `true` for all five portals |
 | `ADAPTER_USE_FIXTURES` | `true` until live scrapers are stable |
 | `FEATURE_GOOGLE_CALENDAR` | `false` until OAuth + calendar scopes ready |
+| `FEATURE_GOOGLE_MAPS` | `false` unless Maps is enabled |
+| `GOOGLE_MAPS_API_KEY` | Optional. Without it (or with `FEATURE_GOOGLE_MAPS=false`), UI/API must degrade — no crash, maps/POI maps features off |
 | `FEATURE_POI` | `false` (stub) |
 | `FEATURE_IMAGE_PROXY` | `true` recommended |
 | `ENVIRONMENT` | `production` |
