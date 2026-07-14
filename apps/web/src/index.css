@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --color-ink: #0b1320;
+  --color-ink-muted: #3d4a5c;
+  --color-paper: #eef1f4;
+  --color-surface: #ffffff;
+  --color-line: #d0d7e0;
+  --color-accent: #0f766e;
+  --color-accent-soft: #ccfbf1;
+  --color-warn: #b45309;
+  --color-danger: #b91c1c;
+  --color-score: #0e7490;
+}
+
+@layer base {
+  html {
+    @apply bg-paper text-ink antialiased;
+    font-family: var(--font-sans);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 80% 50% at 10% -10%, #d4ebe8 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 90% 0%, #dce4f0 0%, transparent 50%),
+      var(--color-paper);
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+  }
+
+  a {
+    color: var(--color-accent);
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .hh-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    overflow: hidden;
+    transition: transform 0.2s ease;
+  }
+
+  .hh-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .hh-btn-primary,
+  .hh-btn-accent,
+  .hh-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.15s, background-color 0.15s, opacity 0.15s;
+  }
+
+  .hh-btn-primary {
+    background-color: var(--color-ink);
+    color: #fff;
+  }
+
+  .hh-btn-primary:hover {
+    background-color: var(--color-ink-muted);
+  }
+
+  .hh-btn-accent {
+    background-color: var(--color-accent);
+    color: #fff;
+  }
+
+  .hh-btn-accent:hover {
+    opacity: 0.9;
+  }
+
+  .hh-btn-ghost {
+    border: 1px solid var(--color-line);
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .hh-btn-ghost:hover {
+    background-color: var(--color-paper);
+  }
+
+  .hh-input {
+    width: 100%;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-line);
+    background-color: var(--color-surface);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+  }
+
+  .hh-input:focus {
+    border-color: var(--color-accent);
+  }
+
+  .hh-label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-muted);
+  }
+
+  .animate-fade-in {
+    animation: hh-fade 0.35s ease-out both;
+  }
+
+  .animate-row-flash {
+    animation: hh-row 0.5s ease-out;
+  }
+}
+
+@keyframes hh-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hh-row {
+  0% {
+    background-color: var(--color-accent-soft);
+  }
+  100% {
+    background-color: transparent;
+  }
+}

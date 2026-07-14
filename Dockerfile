@@ -1,18 +1,17 @@
-# Househunt Opción A — multi-stage: web build (stub OK) + API runtime
+# Househunt Opción A — multi-stage: Vite build → FastAPI static + API
 # syntax=docker/dockerfile:1
 
-# --- Frontend deps / build (placeholder until FE lane fills apps/web) ---
 FROM node:20-alpine AS deps-web
 WORKDIR /web
-# Create minimal stub so stage succeeds without apps/web yet
-RUN mkdir -p /out && echo '<!doctype html><html><body><p>Househunt SPA placeholder</p></body></html>' > /out/index.html
+COPY apps/web/package.json apps/web/package-lock.json ./
+RUN npm ci
 
 FROM node:20-alpine AS build-web
 WORKDIR /web
-COPY --from=deps-web /out /out
-# When apps/web exists, replace with: COPY apps/web/package*.json ./ && npm ci && COPY apps/web . && npm run build && cp -r dist /out
+COPY --from=deps-web /web/node_modules ./node_modules
+COPY apps/web/ ./
+RUN npm run build && mkdir -p /out && cp -r dist/. /out/
 
-# --- API deps ---
 FROM python:3.12-slim AS deps-api
 WORKDIR /build
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -21,7 +20,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY services/api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# --- Runtime ---
 FROM python:3.12-slim AS runtime
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
