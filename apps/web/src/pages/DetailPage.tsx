@@ -19,6 +19,10 @@ import { ZoneMapBlock } from '@/components/ZoneMapBlock'
 import { useActiveList } from '@/context/ActiveListContext'
 import { formatLocation, formatMoney } from '@/lib/format'
 import { resolveDataSource } from '@/lib/listingFidelity'
+import {
+  isUnusualHousePrice,
+  UNUSUAL_PRICE_BANNER,
+} from '@/lib/priceAlerts'
 
 export function DetailPage() {
   const { propertyId } = useParams<{ propertyId: string }>()
@@ -143,6 +147,10 @@ export function DetailPage() {
   const dataSource = resolveDataSource(property)
   const canAdd =
     !interest?.state || (interest.state !== 'active' && interest.state !== 'archived')
+  const showUnusualPrice = isUnusualHousePrice(
+    property.price,
+    property.propertyType,
+  )
 
   return (
     <div className="animate-fade-in">
@@ -173,6 +181,15 @@ export function DetailPage() {
           <p className="mt-1 font-mono text-accent text-lg">
             {formatMoney(property.price)}
           </p>
+          {showUnusualPrice && (
+            <p
+              className="mt-2 rounded border border-warn/40 bg-amber-50 px-3 py-2 text-sm text-warn"
+              role="status"
+              data-testid="unusual-price-banner"
+            >
+              {UNUSUAL_PRICE_BANNER}
+            </p>
+          )}
           <p className="mt-1 text-sm text-ink-muted">
             {formatLocation(property.address)}
           </p>

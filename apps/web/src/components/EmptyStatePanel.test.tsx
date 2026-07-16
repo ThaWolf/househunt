@@ -130,6 +130,9 @@ describe('EmptyStatePanel', () => {
     expect(screen.getByTestId('diag-row-mercadolibre')).toHaveTextContent(
       /20/,
     )
+    expect(
+      screen.getByRole('link', { name: /Agregar publicación externa/i }),
+    ).toHaveAttribute('href', '/interest')
   })
 
   it('falls back to all_partial copy without emptyState wire', () => {

@@ -66,8 +66,8 @@ export function AddExternalListingModal({ onClose, onAdded }: Props) {
           Agregar publicación externa
         </h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Pegá el link de una publicación de cualquier portal. Extraemos los datos y la
-          sumamos a tus intereses con su ficha y reporte.
+          Algunos portales devuelven datos incompletos — revisá el aviso original.
+          Pegá el link y la sumamos a tus intereses con ficha y reporte.
         </p>
 
         <form onSubmit={submit} className="mt-4 space-y-3">

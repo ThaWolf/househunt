@@ -1,3 +1,6 @@
+export const APP_SCORE_TOOLTIP =
+  'Estimación automática; con datos incompletos muchos avisos puntúan parecido.'
+
 type Props = {
   score: number | null | undefined
   size?: 'sm' | 'md' | 'lg'
@@ -29,7 +32,7 @@ export function AppScoreBadge({ score, size = 'md' }: Props) {
   return (
     <span
       className={`inline-flex items-baseline gap-1 rounded font-mono font-medium tabular-nums ${sizeCls} ${tone}`}
-      title="AppScore 0–100"
+      title={APP_SCORE_TOOLTIP}
     >
       <span className="text-[10px] uppercase opacity-70">App</span>
       {score}

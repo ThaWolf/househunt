@@ -4,6 +4,7 @@ import { ApiError } from '@/api/client'
 import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { InterestItem } from '@/api/types'
 import { AddExternalListingModal } from '@/components/AddExternalListingModal'
+import { AMENITY_LEGEND, AmenityCell } from '@/components/AmenityCell'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
 import { DataSourceBadge } from '@/components/DataSourceBadge'
 import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
@@ -15,29 +16,6 @@ import { VisitDateCell } from '@/components/VisitDateCell'
 import { useActiveList } from '@/context/ActiveListContext'
 import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
 import { resolveDataSource } from '@/lib/listingFidelity'
-
-function AmenityCell({ items }: { items: InterestItem['amenitiesHighlight'] }) {
-  if (!items?.length) {
-    return <span className="text-ink-muted">—</span>
-  }
-  return (
-    <div className="flex flex-wrap gap-1">
-      {items.map((a) => (
-        <span
-          key={a.token}
-          title={a.label}
-          className={`inline-flex items-center rounded px-1 py-0.5 font-mono text-[10px] ${
-            a.present
-              ? 'bg-accent-soft text-accent'
-              : 'bg-paper text-ink-muted/60 line-through decoration-ink-muted/30'
-          }`}
-        >
-          {a.present ? '✓' : '—'} {a.label}
-        </span>
-      ))}
-    </div>
-  )
-}
 
 function addedByLabel(item: InterestItem): string {
   const ab = item.addedBy
@@ -186,9 +164,19 @@ export function InterestPage() {
                 <th className="px-2 py-2 font-medium">Agregado por</th>
                 <th className="px-2 py-2 font-medium">Precio</th>
                 <th className="px-2 py-2 font-medium">Localidad</th>
-                <th className="px-2 py-2 font-medium">Rooms</th>
-                <th className="px-2 py-2 font-medium">Amenities</th>
-                <th className="px-2 py-2 font-medium">App</th>
+                <th className="px-2 py-2 font-medium">Hab.</th>
+                <th className="px-2 py-2 font-medium">
+                  <span className="block">Amenities</span>
+                  <span className="mt-0.5 block normal-case tracking-normal font-sans text-[9px] text-ink-muted/80">
+                    {AMENITY_LEGEND}
+                  </span>
+                </th>
+                <th
+                  className="px-2 py-2 font-medium"
+                  title="Estimación automática; con datos incompletos muchos avisos puntúan parecido."
+                >
+                  App
+                </th>
                 <th className="px-2 py-2 font-medium">User</th>
                 <th className="px-2 py-2 font-medium">Visita</th>
                 <th className="px-2 py-2 font-medium">Fecha visita</th>
@@ -268,9 +256,9 @@ export function InterestPage() {
                           )
                         }
                       >
-                        <option value="none">none</option>
-                        <option value="scheduled">scheduled</option>
-                        <option value="visited">visited</option>
+                        <option value="none">Sin visita</option>
+                        <option value="scheduled">Agendada</option>
+                        <option value="visited">Visitada</option>
                       </select>
                     </td>
                     <td className="px-2 py-1.5">

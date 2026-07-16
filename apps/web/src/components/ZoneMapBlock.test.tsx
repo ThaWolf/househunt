@@ -70,4 +70,28 @@ describe('ZoneMapBlock', () => {
       screen.getByRole('link', { name: /Abrir en Google Maps/i }),
     ).toBeInTheDocument()
   })
+
+  it('shows weak geocode warning when status is approximate', () => {
+    render(<ZoneMapBlock zoneReport={zone} map={mapEmbed} />)
+    expect(screen.getByTestId('weak-geocode-message')).toHaveTextContent(
+      /No pudimos ubicar esta propiedad con precisión/i,
+    )
+  })
+
+  it('shows useful message when zone and map are both missing', () => {
+    render(<ZoneMapBlock zoneReport={null} map={null} />)
+    expect(screen.getByTestId('zone-map-block')).toBeInTheDocument()
+    expect(screen.getByTestId('weak-geocode-message')).toHaveTextContent(
+      /análisis de zona puede ser incompleto/i,
+    )
+  })
+
+  it('hides weak geocode warning when status is exact', () => {
+    const exactZone: ZoneReport = {
+      ...zone,
+      geo: { geocodeStatus: 'exact', lat: -34.88, lng: -58.01 },
+    }
+    render(<ZoneMapBlock zoneReport={exactZone} map={mapEmbed} />)
+    expect(screen.queryByTestId('weak-geocode-message')).not.toBeInTheDocument()
+  })
 })

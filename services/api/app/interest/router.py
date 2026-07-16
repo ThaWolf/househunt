@@ -1,11 +1,12 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.adapters.amenities_parse import parse_amenities
 from app.adapters.external import ExternalExtractError, extract_listing
 from app.auth.deps import get_current_user
 from app.config import get_settings
@@ -15,7 +16,7 @@ from app.db.models import User
 from app.errors import AppError
 from app.interest.amenities import amenities_highlight
 from app.interest.deps import require_membership, resolve_list_id
-from app.mappers import property_to_dto, raw_property_to_model
+from app.mappers import apply_raw_to_row, property_to_dto, raw_property_to_model
 from app.schemas.common import InterestState, PageMeta, Visit, VisitStatus
 from app.schemas.interest import (
     AddedByUser,
@@ -51,12 +52,16 @@ def _to_item(
         at=visit.at.isoformat() if visit and visit.at else None,
     )
     author = added_by or getattr(interest, "added_by", None)
+    ams = list(prop.amenities or []) if prop else []
+    if not ams and prop is not None:
+        # Soft infer for stale rows until re-extract (iter-10)
+        ams = parse_amenities(prop.title, prop.description)
     return InterestItem(
         id=interest.id,
         property=property_to_dto(prop),
         state=InterestState(interest.state),
         rooms=prop.rooms if prop else None,
-        amenities_highlight=amenities_highlight(list(prop.amenities or []) if prop else []),
+        amenities_highlight=amenities_highlight(ams),
         user_score=interest.user_score,
         visit=v,
         comments=interest.comments,
@@ -151,9 +156,10 @@ async def create_interest(
     return _to_item(interest, None)
 
 
-@router.post("/external", response_model=InterestItem, status_code=201)
+@router.post("/external", response_model=InterestItem)
 async def create_external_interest(
     body: ExternalInterestRequest,
+    response: Response,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
@@ -174,14 +180,24 @@ async def create_external_interest(
             )
         )
     ).scalar_one_or_none()
+    score = compute_appscore(raw, poi_enabled=settings.feature_poi)
+    breakdown = score.breakdown.model_dump(by_alias=False)
     if prop is None:
-        score = compute_appscore(raw, poi_enabled=settings.feature_poi)
         prop = raw_property_to_model(
             raw,
             app_score=score.score,
-            score_breakdown=score.breakdown.model_dump(by_alias=False),
+            score_breakdown=breakdown,
         )
         db.add(prop)
+        await db.flush()
+    else:
+        # iter-10: refresh stale external/live rows when user re-pastes URL
+        apply_raw_to_row(
+            prop,
+            raw,
+            app_score=score.score,
+            score_breakdown=breakdown,
+        )
         await db.flush()
 
     existing = (
@@ -193,7 +209,20 @@ async def create_external_interest(
         )
     ).scalar_one_or_none()
     if existing:
-        raise AppError(409, "interest_exists", "Esta publicación ya está en tus intereses")
+        # Still refresh property above; return existing interest (not silent stale 409)
+        await db.refresh(existing)
+        existing.property = prop
+        existing.added_by = await db.get(User, existing.added_by_user_id)
+        visit = (
+            await db.execute(
+                select(models.Visit).where(
+                    models.Visit.list_id == existing.list_id,
+                    models.Visit.property_id == existing.property_id,
+                )
+            )
+        ).scalar_one_or_none()
+        response.status_code = 200
+        return _to_item(existing, visit)
 
     interest = models.InterestItem(
         list_id=resolved_list_id,
@@ -205,6 +234,7 @@ async def create_external_interest(
     await db.flush()
     interest.property = prop
     interest.added_by = user
+    response.status_code = 201
     return _to_item(interest, None)
 
 

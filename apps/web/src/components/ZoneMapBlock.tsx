@@ -1,4 +1,5 @@
 import type { MapEmbed, ZonePlace, ZoneReport } from '@/api/types'
+import { isWeakGeocode, WEAK_GEOCODE_MESSAGE } from '@/lib/zoneGeocode'
 
 type Props = {
   zoneReport?: ZoneReport | null
@@ -45,17 +46,41 @@ function PlaceList({
 }
 
 export function ZoneMapBlock({ zoneReport, map }: Props) {
-  if (!zoneReport && !map) return null
-
+  const weakGeocode = isWeakGeocode(zoneReport, map)
   const embedUrl = map?.embedUrl?.trim() || null
   const externalUrl = map?.externalUrl?.trim() || null
+
+  if (!zoneReport && !map) {
+    return (
+      <section
+        className="rounded-lg border border-line bg-surface p-4 animate-fade-in"
+        aria-label="Zona y mapa"
+        data-testid="zone-map-block"
+      >
+        <h2 className="font-display text-xl font-semibold mb-2">Zona</h2>
+        <p className="text-sm text-ink-muted" data-testid="weak-geocode-message">
+          {WEAK_GEOCODE_MESSAGE}
+        </p>
+      </section>
+    )
+  }
 
   return (
     <section
       className="rounded-lg border border-line bg-surface p-4 space-y-4 animate-fade-in"
       aria-label="Zona y mapa"
+      data-testid="zone-map-block"
     >
       <h2 className="font-display text-xl font-semibold">Zona</h2>
+
+      {weakGeocode && (
+        <p
+          className="rounded border border-warn/30 bg-amber-50 px-3 py-2 text-sm text-warn"
+          data-testid="weak-geocode-message"
+        >
+          {WEAK_GEOCODE_MESSAGE}
+        </p>
+      )}
 
       {zoneReport?.summary && (
         <p className="text-sm leading-relaxed text-ink-muted">

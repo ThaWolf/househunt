@@ -147,7 +147,10 @@ async def test_external_interest_dedupe_conflict(client, monkeypatch):
     first = await client.post("/api/interest/external", headers=headers, json=body)
     assert first.status_code == 201
     second = await client.post("/api/interest/external", headers=headers, json=body)
-    assert second.status_code == 409
+    # iter-10: refresh existing interest (200) instead of 409 stale
+    assert second.status_code == 200
+    assert second.json()["id"] == first.json()["id"]
+    assert second.json()["property"]["id"] == first.json()["property"]["id"]
 
 
 @pytest.mark.asyncio

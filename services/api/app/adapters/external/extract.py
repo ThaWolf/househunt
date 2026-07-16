@@ -19,9 +19,11 @@ import re
 from typing import Any
 from urllib.parse import urlparse, urlunparse
 
+from app.adapters.amenities_parse import parse_amenities
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
-from app.adapters.listing_meta import detect_property_type
+from app.adapters.listing_meta import detect_locality, detect_property_type
 from app.adapters.price_parse import parse_price
+from app.adapters.rooms_parse import parse_rooms
 from app.adapters.types import RawProperty
 from app.adapters.veracity import is_banned_image_host
 from app.config import Settings, get_settings
@@ -205,9 +207,40 @@ def _price(ld: dict[str, Any], meta: dict[str, str], body_text: str) -> tuple[fl
         amount, cur = parse_price(str(text), default_currency=(currency or "USD"))
         if amount:
             return amount, (cur or currency or "USD")
-    # fallback: scan a price-looking token in the page text
-    amount, cur = parse_price(body_text or "", default_currency="USD")
+    # fallback: scan body — reject street heights; prefer largest marked price
+    amount, cur = parse_price(
+        body_text or "",
+        default_currency="USD",
+        prefer_largest=True,
+        reject_street_numbers=True,
+    )
     return amount, cur
+
+
+def _normalize_locality(
+    url: str,
+    title: str,
+    description: str | None,
+    body_text: str,
+    ld_locality: str | None,
+    ld_province: str | None,
+) -> tuple[str | None, str | None, str | None]:
+    """Return (locality, neighborhood, province) preferring slug heuristics."""
+    loc, neigh = detect_locality(url, title, description or body_text)
+    if loc:
+        return loc, neigh, "Buenos Aires"
+    # Clean JSON-LD admin labels like "Partido de La Plata, Argentina"
+    if ld_locality:
+        low = ld_locality.lower()
+        if "gonnet" in low:
+            return "Gonnet", None, "Buenos Aires"
+        if "partido de la plata" in low or ld_locality.strip().lower().startswith("partido"):
+            return "La Plata", None, "Buenos Aires"
+        # drop country suffix
+        cleaned = ld_locality.split(",")[0].strip()
+        if cleaned:
+            return cleaned, None, ld_province or "Buenos Aires"
+    return ld_locality, None, ld_province
 
 
 async def extract_listing(url: str, *, settings: Settings | None = None) -> RawProperty:
@@ -257,9 +290,14 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
         prop_type = PropertyType.house
 
     addr = ld.get("address") if isinstance(ld.get("address"), dict) else {}
-    locality = addr.get("addressLocality") if addr else None
-    province = addr.get("addressRegion") if addr else None
+    ld_locality = addr.get("addressLocality") if addr else None
+    ld_province = addr.get("addressRegion") if addr else None
     street = addr.get("streetAddress") if addr else None
+    locality, neighborhood, province = _normalize_locality(
+        url, title, description, body_text, ld_locality, ld_province
+    )
+    rooms = parse_rooms(url, title, description, body_text)
+    amenities = parse_amenities(title, description, body_text)
 
     raw = RawProperty(
         portal=portal or PortalId.external,
@@ -274,6 +312,9 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
         address_raw=street,
         address_province=province,
         address_locality=locality,
+        address_neighborhood=neighborhood,
+        rooms=rooms,
+        amenities=amenities,
         images=images,
         data_source=DataSource.external,
         raw_hints={"source": "external_url", "host": parsed.hostname or "", "detectedPortal": portal.value if portal else None},

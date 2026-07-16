@@ -10,6 +10,14 @@ Branch de trabajo factory: `factory/iter-001`. Do not force-push `main`.
 - Repo pushed to GitHub and linked to Railway **or** Railway CLI (`railway link`)
 - Local secrets ready (JWT, Google OAuth) — never paste them into chat or commit them
 
+**CLI auth pitfall:** if `RAILWAY_TOKEN` is set in your shell (e.g. from `secrets.local.env`) and the token is **expired**, `railway whoami` / `railway up` fail with `Unauthorized` even after a successful `railway login`. Fix: `unset RAILWAY_TOKEN` and use OAuth, or create a fresh token in Railway → Account → Tokens.
+
+```bash
+unset RAILWAY_TOKEN
+railway login
+railway whoami
+```
+
 ## 2. Postgres plugin
 
 1. In the Railway project: **New** → **Database** → **PostgreSQL**.

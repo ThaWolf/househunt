@@ -6,6 +6,7 @@ import logging
 import re
 from urllib.parse import urljoin, urlparse, urlunparse
 
+from app.adapters.amenities_parse import parse_amenities
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
 from app.adapters.rooms_parse import parse_rooms, rooms_min_from_filters
 from app.adapters.types import RawProperty
@@ -142,6 +143,8 @@ async def scrape_argenprop(
         if len(card) > 40:
             desc = card[:2000]
 
+        amenities = parse_amenities(title, desc, href, card)
+
         items.append(
             RawProperty(
                 portal=PortalId.argenprop,
@@ -157,6 +160,7 @@ async def scrape_argenprop(
                 address_province="Buenos Aires",
                 address_locality=locality,
                 rooms=rooms,
+                amenities=amenities,
                 images=images,
                 data_source=DataSource.live,
                 raw_hints={"source": "argenprop_live", "searchUrl": url},

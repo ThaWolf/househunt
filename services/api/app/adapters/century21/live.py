@@ -6,6 +6,7 @@ import logging
 import re
 from urllib.parse import urlparse, urlunparse
 
+from app.adapters.amenities_parse import parse_amenities
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
 from app.adapters.listing_meta import detect_locality, detect_property_type
 from app.adapters.price_parse import parse_price
@@ -292,6 +293,8 @@ async def scrape_century21(
             if parts:
                 desc = parts[-1][:2000]
 
+        amenities = parse_amenities(title, desc, href, card_text)
+
         items.append(
             RawProperty(
                 portal=PortalId.century21,
@@ -308,6 +311,7 @@ async def scrape_century21(
                 address_locality=loc_name,
                 address_neighborhood=neigh,
                 rooms=rooms,
+                amenities=amenities,
                 images=images,
                 data_source=DataSource.live,
                 raw_hints={"source": "century21_html", "searchUrl": url},

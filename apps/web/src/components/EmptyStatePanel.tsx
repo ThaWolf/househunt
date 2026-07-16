@@ -49,6 +49,9 @@ export function EmptyStatePanel({ response }: Props) {
         <Link to="/search" className="hh-btn-accent no-underline text-sm">
           Ajustar filtros
         </Link>
+        <Link to="/interest" className="hh-btn-ghost no-underline text-sm">
+          Agregar publicación externa
+        </Link>
         {hasAnyCounts || rows.length > 0 ? (
           <button
             type="button"
