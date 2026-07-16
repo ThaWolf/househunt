@@ -45,7 +45,8 @@ def test_ml_and_zp_search_url_include_rooms():
     assert "mas-de-3-ambientes" in zp_url(filters)
 
 
-def test_live_ok_result_sets_rooms_filter_wiped():
+def test_live_ok_result_wipes_only_when_all_rooms_known_below_min():
+    """iter-6: wipe legítimo solo si TODOS los rooms son conocidos y < min."""
     settings = get_settings()
     filters = SearchFilters(rooms=MinIntFilter(min=3))
     raw = [
@@ -53,8 +54,8 @@ def test_live_ok_result_sets_rooms_filter_wiped():
             portal=PortalId.zonaprop,
             external_id="1",
             source_url="https://www.zonaprop.com.ar/propiedades/clasificado/casa-1.html",
-            title="Casa sin rooms",
-            rooms=None,
+            title="Casa 1 amb",
+            rooms=1,
             price_amount=100000,
             price_currency="USD",
             data_source=DataSource.live,
@@ -80,6 +81,30 @@ def test_live_ok_result_sets_rooms_filter_wiped():
     assert result.rooms_filter_wiped is True
     assert result.error is not None
     assert result.error.code == AdapterErrorCode.filtered_rooms_null
+
+
+def test_live_ok_result_keeps_unknown_rooms():
+    """iter-6: rooms=None NO se descarta con rooms.min (coverage ML/C21)."""
+    settings = get_settings()
+    filters = SearchFilters(rooms=MinIntFilter(min=3))
+    raw = [
+        RawProperty(
+            portal=PortalId.century21,
+            external_id="309776",
+            source_url="https://century21.com.ar/propiedad/309776",
+            title="Casa en venta Gonnet",
+            rooms=None,
+            price_amount=None,
+            address_locality="Gonnet",
+            data_source=DataSource.live,
+            images=[{"url": "/placeholder-listing.svg", "order": 0, "kind": "placeholder"}],
+        )
+    ]
+    result = live_ok_result(PortalId.century21, filters, raw, settings=settings)
+    assert result.status == AdapterStatus.ok
+    assert len(result.items) == 1
+    assert result.rooms_filter_wiped is False
+    assert result.rooms_dropped == 0
 
 
 def test_live_ok_result_keeps_items_when_rooms_parsed():
@@ -173,7 +198,9 @@ async def test_search_response_includes_diagnostics(client, monkeypatch):
     assert "rawCount" in data["diagnostics"]
     assert "roomsFilterWiped" in data["diagnostics"]
     by = {p["portal"]: p for p in data["portalResults"]}
-    assert by["remax"]["diagnostics"]["roomsFilterWiped"] is True
-    assert data["diagnostics"]["emptyState"] is None or len(data["items"]) > 0
-    # other portals with rooms=4 should yield items
-    assert len(data["items"]) >= 1
+    # iter-6: remax con rooms=None ya NO se wipea (coverage) → aparece
+    assert by["remax"]["diagnostics"]["roomsFilterWiped"] is False
+    assert by["remax"]["count"] >= 1
+    assert data["diagnostics"]["emptyState"] is None
+    # 4 portales rooms=4 + remax rooms=None (kept) = 5 items
+    assert len(data["items"]) >= 5

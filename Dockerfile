@@ -20,17 +20,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY services/api/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Runtime stays slim on purpose: Playwright Chromium (~100MB+ plus OS deps) is
-# NOT installed here. Live scrap (ADAPTER_USE_FIXTURES=false) should use a host
-# venv: `python -m playwright install chromium` — see README.
-# Optional bake-in later:
-#   RUN playwright install --with-deps chromium
+# Runtime with Playwright Chromium baked in (required for live scrap in prod).
+# Image ~1GB; Railway service should have ≥1–2 GB RAM.
 FROM python:3.12-slim AS runtime
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000 \
-    STATIC_DIR=/app/static
+    STATIC_DIR=/app/static \
+    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -38,6 +36,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY --from=deps-api /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps-api /usr/local/bin /usr/local/bin
+RUN playwright install --with-deps chromium
+
 COPY services/api/ /app/
 COPY --from=build-web /out /app/static
 

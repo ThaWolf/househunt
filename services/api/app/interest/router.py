@@ -6,20 +6,24 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.adapters.external import ExternalExtractError, extract_listing
 from app.auth.deps import get_current_user
+from app.config import get_settings
 from app.db import models
 from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
 from app.interest.amenities import amenities_highlight
-from app.mappers import property_to_dto
+from app.mappers import property_to_dto, raw_property_to_model
 from app.schemas.common import InterestState, PageMeta, Visit, VisitStatus
 from app.schemas.interest import (
     CreateInterestRequest,
+    ExternalInterestRequest,
     InterestItem,
     InterestListResponse,
     PatchInterestRequest,
 )
+from app.scoring.appscore import compute_appscore
 
 router = APIRouter(prefix="/interest", tags=["interest"])
 
@@ -118,6 +122,60 @@ async def create_interest(
     await db.flush()
     await db.refresh(interest, attribute_names=["property"])
     # ensure property loaded
+    interest.property = prop
+    return _to_item(interest, None)
+
+
+@router.post("/external", response_model=InterestItem, status_code=201)
+async def create_external_interest(
+    body: ExternalInterestRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> InterestItem:
+    """iter-9: pegar la URL de una publicación externa → Property + interés."""
+    settings = get_settings()
+    try:
+        raw = await extract_listing(body.url)
+    except ExternalExtractError as exc:
+        raise AppError(422, exc.code, exc.message)
+
+    portal_val = raw.portal.value if hasattr(raw.portal, "value") else str(raw.portal)
+    prop = (
+        await db.execute(
+            select(models.Property).where(
+                models.Property.portal == portal_val,
+                models.Property.external_id == raw.external_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if prop is None:
+        score = compute_appscore(raw, poi_enabled=settings.feature_poi)
+        prop = raw_property_to_model(
+            raw,
+            app_score=score.score,
+            score_breakdown=score.breakdown.model_dump(by_alias=False),
+        )
+        db.add(prop)
+        await db.flush()
+
+    existing = (
+        await db.execute(
+            select(models.InterestItem).where(
+                models.InterestItem.user_id == user.id,
+                models.InterestItem.property_id == prop.id,
+            )
+        )
+    ).scalar_one_or_none()
+    if existing:
+        raise AppError(409, "interest_exists", "Esta publicación ya está en tus intereses")
+
+    interest = models.InterestItem(
+        user_id=user.id,
+        property_id=prop.id,
+        state=InterestState.active.value,
+    )
+    db.add(interest)
+    await db.flush()
     interest.property = prop
     return _to_item(interest, None)
 

@@ -38,7 +38,7 @@ def _inventory() -> list[RawProperty]:
                 price_currency="USD",
                 address_locality="Gonnet",
                 address_raw="Manuel B. Gonnet, La Plata",
-                rooms=3 if i > 0 else None,  # one null rooms for rooms.min exclude
+                rooms=3 if i > 0 else None,  # one null rooms — iter-6 keeps it (coverage)
                 amenities=["jardin", "pileta"] if i % 2 == 0 else ["jardin"],
                 images=[
                     {
@@ -239,7 +239,8 @@ async def test_search_solo_max_price_at_least_8(client, mock_live_adapters):
 
 
 @pytest.mark.asyncio
-async def test_search_rooms_min_excludes_null_and_low(client, mock_live_adapters):
+async def test_search_rooms_min_excludes_low_but_keeps_null(client, mock_live_adapters):
+    """iter-6: rooms conocido < min se excluye; rooms=None se MANTIENE (coverage)."""
     reg = await client.post(
         "/api/auth/register",
         json={"email": "rooms@example.com", "password": "password123", "displayName": "R"},
@@ -262,10 +263,13 @@ async def test_search_rooms_min_excludes_null_and_low(client, mock_live_adapters
     items = resp.json()["items"]
     assert items
     for item in items:
-        assert item.get("rooms") is not None
-        assert item["rooms"] >= 3
+        # ningún item con rooms conocido por debajo del mínimo
+        if item.get("rooms") is not None:
+            assert item["rooms"] >= 3
     ext_ids = {i["externalId"] for i in items}
-    assert "zp-g-0" not in ext_ids  # null rooms
+    assert "zp-g-0" in ext_ids  # rooms=None ahora se mantiene (coverage)
+    # distractores de Pilar siguen excluidos por ubicación
+    assert not any(e.startswith("rx-p-") for e in ext_ids)
 
 
 @pytest.mark.asyncio

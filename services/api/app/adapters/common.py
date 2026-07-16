@@ -54,24 +54,39 @@ def filter_raw_items(items: list[RawProperty], filters: SearchFilters) -> list[R
     from app.search.postfilter import resolve_location
 
     location = resolve_location(filters)
+    want_type = (
+        filters.property_type.value
+        if hasattr(filters.property_type, "value")
+        else str(filters.property_type)
+    )
     out: list[RawProperty] = []
     for item in items:
-        if filters.price:
-            currency = (item.price_currency or "USD").upper()
-            want = filters.price.currency.value if filters.price.currency else "USD"
-            if currency != want:
-                continue
-            if filters.price.min is not None and (
-                item.price_amount is None or item.price_amount < filters.price.min
-            ):
-                continue
-            if filters.price.max is not None and (
-                item.price_amount is None or item.price_amount > filters.price.max
-            ):
-                continue
+        # iter-7: fuera de scope de tipo (depto/oficina/cochera/…) → descarta. Ver analysis/RCA.md.
+        item_type = (
+            item.property_type.value
+            if hasattr(item.property_type, "value")
+            else str(item.property_type)
+        )
+        if item_type != want_type:
+            continue
+        # iter-6: dato faltante (precio/ambientes) NO descarta — coverage. Ver analysis/RCA.md.
+        if filters.price and (
+            filters.price.min is not None or filters.price.max is not None
+        ):
+            if item.price_amount is not None:
+                currency = (item.price_currency or "USD").upper()
+                want = filters.price.currency.value if filters.price.currency else "USD"
+                if currency != want:
+                    continue
+                if filters.price.min is not None and item.price_amount < filters.price.min:
+                    continue
+                if filters.price.max is not None and item.price_amount > filters.price.max:
+                    continue
+            # price_amount None → se mantiene (UI marca "precio a confirmar")
         if filters.rooms and filters.rooms.min is not None:
-            if item.rooms is None or item.rooms < filters.rooms.min:
+            if item.rooms is not None and item.rooms < filters.rooms.min:
                 continue
+            # rooms None → se mantiene (ML/C21 rara vez exponen ambientes en la card)
         if location is not None:
             if not location_matches_listing(
                 location,
@@ -159,7 +174,11 @@ dense_fixture_slice = curated_fixture_slice
 def _count_rooms_drops(
     items: list[RawProperty], filters: SearchFilters
 ) -> tuple[int, list[str]]:
-    """Count items that fail solely on rooms.min (null or below)."""
+    """Count items excluded by rooms.min. iter-6: rooms null se MANTIENE (no cuenta como drop).
+
+    Solo cuenta `rooms` conocido y < min (rooms_below_min). Los nulls kept se informan
+    aparte como `rooms_null` en reasons (para diagnóstico) sin sumar a dropped.
+    """
     if filters.rooms is None or filters.rooms.min is None:
         return 0, []
     min_rooms = filters.rooms.min
@@ -167,7 +186,6 @@ def _count_rooms_drops(
     reasons: list[str] = []
     for item in items:
         if item.rooms is None:
-            dropped += 1
             if "rooms_null" not in reasons:
                 reasons.append("rooms_null")
         elif item.rooms < min_rooms:

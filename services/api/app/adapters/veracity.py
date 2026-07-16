@@ -95,6 +95,6 @@ def image_host_ok_for_portal(portal: PortalId, url: str) -> bool:
 def normalize_data_source(value: str | DataSource | None) -> DataSource:
     if isinstance(value, DataSource):
         return value
-    if value in ("live", "fixture_curated", "demo_stub"):
+    if value in ("live", "fixture_curated", "demo_stub", "external"):
         return DataSource(value)
     return DataSource.live

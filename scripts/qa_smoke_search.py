@@ -173,6 +173,73 @@ def main() -> int:
             if img.get("kind") == "source" and any(b in url for b in BANNED):
                 critical.append(f"banned image host: {url}")
 
+    # A10 iter-7 — fidelidad: solo casas + solo la localidad pedida (Gonnet)
+    def _norm(s: str | None) -> str:
+        return (s or "").strip().lower()
+
+    allowed_loc = {"gonnet", "manuel b gonnet", "manuel b. gonnet", "la plata", ""}
+    non_casa = [it.get("id") for it in items if it.get("propertyType") != "house"]
+    if non_casa:
+        critical.append(
+            f"non-casa items in results ({len(non_casa)}): {non_casa[:5]} (iter-7 fidelity)"
+        )
+    wrong_loc = []
+    for it in items:
+        addr = it.get("address") or {}
+        loc = _norm(addr.get("locality"))
+        neigh = _norm(addr.get("neighborhood"))
+        title = _norm(it.get("title"))
+        if not loc and not neigh and "gonnet" not in title:
+            continue  # sin dato de localidad → lo decide el geo-match, no lo penalizamos acá
+        ok = (
+            "gonnet" in loc
+            or "gonnet" in neigh
+            or "gonnet" in title
+            or loc in allowed_loc
+        )
+        if not ok:
+            wrong_loc.append({"id": it.get("id"), "locality": addr.get("locality")})
+    if wrong_loc:
+        critical.append(
+            f"wrong-locality items ({len(wrong_loc)}): {wrong_loc[:5]} (iter-7 fidelity)"
+        )
+
+    # A11 iter-8 — el aviso testigo C21 debe aparecer (ahora alcanzable server-side)
+    expect_id = os.environ.get("QA_SMOKE_EXPECT_ID", "309776").strip()
+    if expect_id:
+        ext_ids = {str(it.get("externalId") or "") for it in items}
+        if expect_id not in ext_ids:
+            critical.append(
+                f"expected C21 listing {expect_id} not present (iter-8 coverage)"
+            )
+        c21 = next(
+            (p for p in portal_results if p.get("portal") == "century21"),
+            None,
+        )
+        if c21 and (c21.get("count") or 0) == 0:
+            critical.append("century21 count==0 (iter-8 coverage)")
+
+    # A12 iter-9 — imágenes C21 reales (no placeholders); host 21online.lat
+    c21_items = [it for it in items if (it.get("portal") == "century21")]
+    if c21_items:
+        c21_source = 0
+        c21_placeholder = 0
+        for it in c21_items:
+            imgs = it.get("images") or []
+            first = imgs[0] if imgs else {}
+            kind = first.get("kind")
+            host = (first.get("url") or "").lower()
+            if kind == "source" and "21online.lat" in host:
+                c21_source += 1
+            elif kind == "placeholder" or not imgs:
+                c21_placeholder += 1
+        if c21_source == 0:
+            critical.append(
+                "no C21 item has a real source image (cdn.21online.lat) — iter-9 P0-1"
+            )
+        if c21_placeholder:
+            major.append(f"C21 items still on placeholder: {c21_placeholder}")
+
     # A4 major — diagnostics present
     if not diagnostics:
         major.append("missing diagnostics")

@@ -47,6 +47,12 @@ class CreateInterestRequest(CamelModel):
     property_id: UUID
 
 
+class ExternalInterestRequest(CamelModel):
+    """iter-9: agregar una publicación externa por URL a intereses."""
+
+    url: str = Field(min_length=8, max_length=2048)
+
+
 class PatchInterestRequest(CamelModel):
     user_score: int | None = Field(default=None, ge=1, le=10)
     comments: str | None = None

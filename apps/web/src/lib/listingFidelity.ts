@@ -31,9 +31,10 @@ export function isLiveDataSource(ds: DataSource): boolean {
 /** Badge when ≠ live (E17). */
 export function dataSourceBadgeLabel(
   ds: DataSource,
-): 'Demo' | 'Fixtures' | null {
+): 'Demo' | 'Fixtures' | 'Externa' | null {
   if (ds === 'live') return null
   if (ds === 'fixture_curated') return 'Fixtures'
+  if (ds === 'external') return 'Externa'
   return 'Demo'
 }
 
@@ -61,7 +62,11 @@ export function canOpenPortalCta(opts: {
 }): boolean {
   if (opts.dataSource === 'demo_stub') return false
   if (!isValidPortalUrl(opts.sourceUrl)) return false
-  return opts.dataSource === 'live' || opts.dataSource === 'fixture_curated'
+  return (
+    opts.dataSource === 'live' ||
+    opts.dataSource === 'fixture_curated' ||
+    opts.dataSource === 'external'
+  )
 }
 
 export function isStockImageUrl(url: string): boolean {

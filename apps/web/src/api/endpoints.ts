@@ -5,6 +5,7 @@ import type {
   CalendarResponse,
   CalendarSyncResponse,
   CreateInterestRequest,
+  ExternalInterestRequest,
   GeoSuggestResponse,
   InterestListResponse,
   InterestItem,
@@ -71,6 +72,11 @@ export const interestApi = {
     ),
   create: (body: CreateInterestRequest) =>
     apiRequest<InterestItem>('/api/interest', { method: 'POST', body }),
+  createExternal: (body: ExternalInterestRequest) =>
+    apiRequest<InterestItem>('/api/interest/external', {
+      method: 'POST',
+      body,
+    }),
   patch: (interestId: string, body: PatchInterestRequest) =>
     apiRequest<InterestItem>(`/api/interest/${interestId}`, {
       method: 'PATCH',

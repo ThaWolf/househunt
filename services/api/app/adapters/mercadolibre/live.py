@@ -7,6 +7,7 @@ import re
 from urllib.parse import urlparse, urlunparse
 
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
+from app.adapters.price_parse import detect_currency
 from app.adapters.rooms_parse import parse_rooms, rooms_min_from_filters
 from app.adapters.types import RawProperty
 from app.adapters.veracity import HOUSEHUNT_PLACEHOLDER_URL, image_host_ok_for_portal
@@ -137,9 +138,14 @@ async def scrape_mercadolibre(
         if not re.search(r"casa|chalet|ph|inmueble|propiedad", title, re.I) and "casa.mercadolibre" not in href:
             if "articulo.mercadolibre" in href:
                 continue
-        amount, currency = _parse_price_from_card(row.get("price"))
-        if row.get("currencySymbol") and "U$S" in str(row.get("currencySymbol")).upper():
-            currency = "USD"
+        amount, _ = _parse_price_from_card(row.get("price"))
+        # iter-6: reconocer "US$" (ML muestra dólares así) — antes caía a ARS y el filtro lo descartaba
+        currency = (
+            detect_currency(
+                row.get("currencySymbol"), row.get("price"), row.get("cardText")
+            )
+            or "USD"
+        )
         rooms = parse_rooms(row.get("attrs"), row.get("cardText"), title, href)
         if rooms is None and rooms_min is not None and f"{rooms_min}-ambientes" in url:
             # Portal already filtered by N-ambientes path

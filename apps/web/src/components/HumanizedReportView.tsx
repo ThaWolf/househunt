@@ -9,6 +9,7 @@ import {
   normalizeScoreComponentId,
 } from '@/api/types'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
+import { InfoTooltip } from '@/components/InfoTooltip'
 
 type Props = {
   report: HumanizedReport | null
@@ -49,7 +50,7 @@ function riskSubtitle(
   const id = normalizeScoreComponentId(component.id)
   if (id !== 'riskSafety') return null
   if (riskHits.length === 0 && component.score >= 80) {
-    return 'Sin señales de riesgo en el aviso'
+    return 'Sin alertas en el texto del aviso'
   }
   return null
 }
@@ -70,14 +71,6 @@ export function HumanizedReportView({ report, fallbackAppScore }: Props) {
         <p className="text-sm text-ink-muted">Reporte aún no generado.</p>
       ) : (
         <>
-          {report.summary ? (
-            <p className="mb-4 text-sm leading-relaxed text-ink-muted">
-              {report.summary}
-            </p>
-          ) : (
-            <p className="mb-4 text-sm text-ink-muted">Sin resumen.</p>
-          )}
-
           {report.components.length > 0 && (
             <ul className="mb-4 space-y-4" aria-label="Componentes del score">
               {report.components.map((c) => {
@@ -89,8 +82,11 @@ export function HumanizedReportView({ report, fallbackAppScore }: Props) {
 
                 return (
                   <li key={`${c.id}-${label}`}>
-                    <div className="mb-0.5 flex items-baseline justify-between gap-2 text-sm">
-                      <span className="font-medium text-ink">{label}</span>
+                    <div className="mb-1 flex items-baseline justify-between gap-2 text-sm">
+                      <span className="flex items-center gap-1.5 font-medium text-ink">
+                        {label}
+                        <InfoTooltip text={help} label={label} />
+                      </span>
                       <span className="font-mono text-xs text-ink-muted">
                         {Math.round(c.score)}
                         {c.maxScore ? ` / ${Math.round(c.maxScore)}` : ''}
@@ -99,9 +95,6 @@ export function HumanizedReportView({ report, fallbackAppScore }: Props) {
                         </span>
                       </span>
                     </div>
-                    <p className="mb-1.5 text-xs leading-snug text-ink-muted">
-                      {help}
-                    </p>
                     <div
                       className="h-2 overflow-hidden rounded-full bg-paper"
                       role="progressbar"
@@ -147,13 +140,19 @@ export function HumanizedReportView({ report, fallbackAppScore }: Props) {
             </ul>
           )}
 
+          {report.summary && (
+            <div className="mb-2 rounded-md border border-line bg-paper p-3">
+              <p className="text-sm leading-relaxed text-ink">{report.summary}</p>
+            </div>
+          )}
+
           {/* Hits when riskSafety bar missing but hits exist */}
           {report.riskHits.length > 0 &&
             !report.components.some(
               (c) => normalizeScoreComponentId(c.id) === 'riskSafety',
             ) && (
               <div>
-                <h3 className="hh-label mb-1">Salud legal / riesgo</h3>
+                <h3 className="hh-label mb-1">Seguridad</h3>
                 <ul className="list-disc space-y-1 pl-5 text-sm text-warn">
                   {report.riskHits.map((hit) => (
                     <li key={`${hitKeyword(hit)}-${hitLabel(hit)}`}>

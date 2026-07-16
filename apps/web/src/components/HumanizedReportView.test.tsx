@@ -11,7 +11,7 @@ const sample: HumanizedReport = {
       id: 'attrs',
       label: 'Atributos',
       helpText:
-        'Habitaciones, baños, cochera y amenities vs lo esperado para una casa.',
+        'Habitaciones, baños, cochera y comodidades, comparado con lo esperable para una casa.',
       score: 80,
       maxScore: 100,
       barPct: 80,
@@ -20,7 +20,7 @@ const sample: HumanizedReport = {
       id: 'area',
       label: 'Superficie',
       helpText:
-        'Metros cubiertos y terreno frente a un rango típico del cohort local.',
+        'Metros cubiertos y de terreno, comparado con casas parecidas de la zona.',
       score: 60,
       maxScore: 100,
       barPct: 60,
@@ -28,26 +28,28 @@ const sample: HumanizedReport = {
     {
       id: 'zone',
       label: 'Zona',
-      helpText: 'Actividad del entorno (POI, comercios, transporte) cerca del inmueble.',
+      helpText:
+        'Qué tan movida está la zona: comercios, transporte y lugares cerca del inmueble.',
       score: 50,
       maxScore: 100,
       barPct: 50,
-      summary: 'Sin datos de zona — peso redistribuido',
+      summary:
+        'No pudimos analizar la zona en esta búsqueda, así que este punto no baja el puntaje.',
     },
     {
       id: 'priceFit',
       label: 'Ajuste de precio',
       helpText:
-        'Qué tan alineado está el precio vs casas similares (mismo band de zona).',
+        'Si el precio está barato, caro o en su punto para casas parecidas de la zona.',
       score: 70,
       maxScore: 100,
       barPct: 70,
     },
     {
       id: 'riskSafety',
-      label: 'Salud legal / riesgo',
+      label: 'Seguridad',
       helpText:
-        'Señales en el texto del aviso (obra, legal, patología). 100 = sin señales; 0 = muchas.',
+        'Buscamos alertas en el texto del aviso (para refaccionar, humedad, temas legales). 100 = sin alertas; más bajo = más señales para revisar.',
       score: 90,
       maxScore: 100,
       barPct: 90,
@@ -58,7 +60,7 @@ const sample: HumanizedReport = {
 }
 
 describe('HumanizedReportView', () => {
-  it('renders helpText, riskSafety label, and bars without raw JSON', () => {
+  it('renders friendly labels, positive Seguridad score, tooltips and bars without raw JSON', () => {
     const { container } = render(<HumanizedReportView report={sample} />)
     expect(screen.getByText('Reporte Househunt')).toBeInTheDocument()
     expect(screen.getByText(/Casa sólida/)).toBeInTheDocument()
@@ -66,9 +68,12 @@ describe('HumanizedReportView', () => {
     expect(screen.getByText('Superficie')).toBeInTheDocument()
     expect(screen.getByText('Zona')).toBeInTheDocument()
     expect(screen.getByText('Ajuste de precio')).toBeInTheDocument()
-    expect(screen.getByText('Salud legal / riesgo')).toBeInTheDocument()
+    // Score renombrado en positivo, sin "riesgo" ni "salud legal"
+    expect(screen.getByText('Seguridad')).toBeInTheDocument()
+    expect(screen.queryByText(/salud legal/i)).not.toBeInTheDocument()
+    // helpText vive en el tooltip "?" (fuera del cuerpo), no como párrafo permanente
     expect(
-      screen.getByText(/100 = sin señales/i),
+      screen.getByRole('button', { name: /Qué mide Seguridad/i }),
     ).toBeInTheDocument()
     expect(screen.getByText('Riesgo de obra')).toBeInTheDocument()
     expect(screen.getByLabelText('Atributos')).toHaveAttribute(
@@ -77,9 +82,11 @@ describe('HumanizedReportView', () => {
     )
     expect(container.querySelector('pre')).toBeNull()
     expect(container.textContent).not.toMatch(/"weights"/)
+    // sin jerga técnica en el cuerpo del informe
+    expect(container.textContent).not.toMatch(/cohort|peso redistribuido|patología/i)
   })
 
-  it('maps legacy risk id to Salud legal / riesgo and clean subtitle', () => {
+  it('maps legacy risk id to positive Seguridad label and clean subtitle', () => {
     const legacy: HumanizedReport = {
       summary: null,
       appScore: 88,
@@ -97,8 +104,8 @@ describe('HumanizedReportView', () => {
       generatedAt: '2026-07-14T12:00:00.000Z',
     }
     render(<HumanizedReportView report={legacy} />)
-    expect(screen.getByText('Salud legal / riesgo')).toBeInTheDocument()
-    expect(screen.getByText(/Sin señales de riesgo en el aviso/i)).toBeInTheDocument()
+    expect(screen.getByText('Seguridad')).toBeInTheDocument()
+    expect(screen.getByText(/Sin alertas en el texto del aviso/i)).toBeInTheDocument()
     expect(screen.queryByText(/^Riesgo$/)).not.toBeInTheDocument()
   })
 

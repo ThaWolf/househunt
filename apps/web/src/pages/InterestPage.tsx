@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { interestApi, propertiesApi } from '@/api/endpoints'
 import type { AmenityHighlight, InterestItem } from '@/api/types'
+import { AddExternalListingModal } from '@/components/AddExternalListingModal'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
 import { DataSourceBadge } from '@/components/DataSourceBadge'
 import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
@@ -39,6 +40,7 @@ export function InterestPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
+  const [showAddExternal, setShowAddExternal] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -67,6 +69,12 @@ export function InterestPage() {
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error al guardar score')
     }
+  }
+
+  function onExternalAdded(item: InterestItem) {
+    setItems((prev) => [item, ...prev.filter((i) => i.id !== item.id)])
+    setFlashId(item.id)
+    setError(null)
   }
 
   async function archive(item: InterestItem) {
@@ -111,9 +119,18 @@ export function InterestPage() {
             Tabla densa — rooms, amenities (pileta/jardín), UserScore, visita.
           </p>
         </div>
-        <Link to="/archived" className="hh-btn-ghost no-underline text-sm">
-          Ver archivadas
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="hh-btn-accent text-sm"
+            onClick={() => setShowAddExternal(true)}
+          >
+            + Agregar publicación externa
+          </button>
+          <Link to="/archived" className="hh-btn-ghost no-underline text-sm">
+            Ver archivadas
+          </Link>
+        </div>
       </div>
 
       {error && (
@@ -125,7 +142,15 @@ export function InterestPage() {
       {items.length === 0 ? (
         <p className="py-12 text-center text-ink-muted">
           Todavía no hay propiedades en interés.{' '}
-          <Link to="/search">Buscar</Link>
+          <Link to="/search">Buscar</Link> o agregá una{' '}
+          <button
+            type="button"
+            className="text-accent underline"
+            onClick={() => setShowAddExternal(true)}
+          >
+            publicación externa
+          </button>
+          .
         </p>
       ) : (
         <div className="overflow-x-auto rounded border border-line bg-surface">
@@ -237,6 +262,13 @@ export function InterestPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {showAddExternal && (
+        <AddExternalListingModal
+          onClose={() => setShowAddExternal(false)}
+          onAdded={onExternalAdded}
+        />
       )}
     </div>
   )

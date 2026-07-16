@@ -6,6 +6,7 @@ export type PortalId =
   | 'mercadolibre'
   | 'remax'
   | 'century21'
+  | 'external'
 
 export type Operation = 'buy'
 export type PropertyType = 'house' | 'apartment' | 'land' | 'other'
@@ -50,7 +51,7 @@ export type PriceStance = 'low' | 'fair' | 'high' | 'unknown'
 /** E19 — required on every ImageRef. */
 export type ImageKind = 'source' | 'proxied' | 'placeholder'
 /** E17 — required on Property. FE alias listingFidelity ≡ same values. */
-export type DataSource = 'live' | 'fixture_curated' | 'demo_stub'
+export type DataSource = 'live' | 'fixture_curated' | 'demo_stub' | 'external'
 export type DataSourceHint = DataSource | 'mixed'
 export type ZonePlaceSource = 'seed' | 'places' | 'stub'
 export type ZoneProvider = 'none' | 'seed' | 'google_places'
@@ -430,6 +431,10 @@ export interface CreateInterestRequest {
   propertyId: string
 }
 
+export interface ExternalInterestRequest {
+  url: string
+}
+
 export interface PatchInterestRequest {
   userScore?: number | null
   comments?: string | null
@@ -517,6 +522,7 @@ export const PORTAL_LABELS: Record<PortalId, string> = {
   mercadolibre: 'Mercado Libre',
   remax: 'Remax',
   century21: 'Century 21',
+  external: 'Externa',
 }
 
 /** Canonical labels / helpText when BE omits them (E11–E12). */
@@ -527,26 +533,27 @@ export const SCORE_COMPONENT_COPY: Record<
   attrs: {
     label: 'Atributos',
     helpText:
-      'Habitaciones, baños, cochera y amenities vs lo esperado para una casa.',
+      'Habitaciones, baños, cochera y comodidades, comparado con lo esperable para una casa.',
   },
   area: {
     label: 'Superficie',
     helpText:
-      'Metros cubiertos y terreno frente a un rango típico del cohort local.',
+      'Metros cubiertos y de terreno, comparado con casas parecidas de la zona.',
   },
   zone: {
     label: 'Zona',
-    helpText: 'Actividad del entorno (POI, comercios, transporte) cerca del inmueble.',
+    helpText:
+      'Qué tan movida está la zona: comercios, transporte y lugares cerca del inmueble.',
   },
   priceFit: {
     label: 'Ajuste de precio',
     helpText:
-      'Qué tan alineado está el precio vs casas similares (mismo band de zona).',
+      'Si el precio está barato, caro o en su punto para casas parecidas de la zona.',
   },
   riskSafety: {
-    label: 'Salud legal / riesgo',
+    label: 'Seguridad',
     helpText:
-      'Señales en el texto del aviso (obra, legal, patología). 100 = sin señales; 0 = muchas.',
+      'Buscamos alertas en el texto del aviso (para refaccionar, humedad, temas legales). 100 = sin alertas; más bajo = más señales para revisar.',
   },
 }
 

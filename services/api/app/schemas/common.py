@@ -27,6 +27,8 @@ class PortalId(str, Enum):
     mercadolibre = "mercadolibre"
     remax = "remax"
     century21 = "century21"
+    # iter-9: publicación agregada por el usuario desde una URL de host no reconocido
+    external = "external"
 
 
 class Operation(str, Enum):
@@ -191,6 +193,8 @@ class DataSource(str, Enum):
     live = "live"
     fixture_curated = "fixture_curated"
     demo_stub = "demo_stub"
+    # iter-9: publicación agregada por el usuario vía URL (extracción externa)
+    external = "external"
 
 
 class ImageRef(CamelModel):

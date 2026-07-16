@@ -34,8 +34,8 @@ services:
       ADAPTER_USE_FIXTURES: "false"
       ADAPTER_TIMEOUT_SECONDS: "45"
       FEATURE_GOOGLE_CALENDAR: "false"
-      FEATURE_GOOGLE_MAPS: "false"
-      # Optional: host/.env substitution; empty = degrade (env_file also loads .env)
+      FEATURE_GOOGLE_MAPS: "true"
+      # Optional: host/.env substitution; empty/placeholder = degrade (env_file also loads .env)
       GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
       FEATURE_IMAGE_PROXY: "true"
       FEATURE_POI: "false"

@@ -234,7 +234,9 @@ async def run_search(
     started = time.perf_counter()
     search_id = uuid.uuid4()
 
+    # external no es un portal de scraping: solo se usa para publicaciones agregadas por URL
     portals = filters.portals or list(PortalId)
+    portals = [p for p in portals if p is not PortalId.external]
     timeout = settings.adapter_timeout_seconds
 
     async def _one(portal: PortalId) -> AdapterResult:

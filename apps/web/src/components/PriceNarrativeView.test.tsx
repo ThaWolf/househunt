@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react'
 import { PriceNarrativeView } from '@/components/PriceNarrativeView'
 
 describe('PriceNarrativeView', () => {
-  it('renders summary and stance', () => {
-    render(
+  it('renders friendly summary and typical price without jargon', () => {
+    const { container } = render(
       <PriceNarrativeView
         narrative={{
           summary: 'El precio está por debajo del promedio de 6 avisos similares.',
@@ -16,8 +16,10 @@ describe('PriceNarrativeView', () => {
       />,
     )
     expect(screen.getByText(/por debajo del promedio/i)).toBeInTheDocument()
-    expect(screen.getByText(/Por debajo del cohort/i)).toBeInTheDocument()
-    expect(screen.getByText('6')).toBeInTheDocument()
+    expect(screen.getByText(/Precio típico de casas parecidas/i)).toBeInTheDocument()
+    expect(screen.getByText(/6 avisos parecidos/i)).toBeInTheDocument()
+    // sin jerga: cohort / stance / pares / mediana peers
+    expect(container.textContent).not.toMatch(/cohort|stance|mediana peers/i)
   })
 
   it('renders nothing when narrative missing', () => {

@@ -46,10 +46,12 @@ def test_risk_safety_label_and_helptext_no_invert():
     )
     report = build_humanized_report(clean)
     risk = next(c for c in report.components if c.id == "riskSafety")
-    assert risk.label == "Salud legal / riesgo"
+    # iter-6: score renombrado en positivo, sin "riesgo" / "salud legal"
+    assert risk.label == "Seguridad"
     assert risk.help_text
-    assert risk.score >= 95  # 100 = sin señales
-    assert "Sin señales" in (risk.summary or "")
+    assert "patología" not in risk.help_text.lower()
+    assert risk.score >= 95  # 100 = sin alertas
+    assert "Sin alertas" in (risk.summary or "")
     for c in report.components:
         assert c.help_text, f"{c.id} missing helpText"
     assert not any(c.id == "risk" for c in report.components)
