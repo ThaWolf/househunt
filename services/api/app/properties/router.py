@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +11,7 @@ from app.db import models
 from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
+from app.interest.deps import ensure_default_list, resolve_list_id
 from app.mappers import interest_flags, property_to_dto
 from app.schemas.common import Operation, PortalId, PropertyType
 from app.schemas.property import PropertyDetailResponse
@@ -57,6 +58,7 @@ def _row_as_raw(row: models.Property) -> RawProperty:
 @router.get("/{property_id}", response_model=PropertyDetailResponse)
 async def get_property(
     property_id: UUID,
+    list_id: UUID | None = Query(default=None, alias="listId"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> PropertyDetailResponse:
@@ -65,10 +67,15 @@ async def get_property(
     if row is None:
         raise AppError(404, "not_found", "Property not found")
 
+    resolved_list_id = await resolve_list_id(db, user, list_id) if list_id else None
+    if resolved_list_id is None:
+        default_list = await ensure_default_list(db, user.id)
+        resolved_list_id = default_list.id
+
     interest = (
         await db.execute(
             select(models.InterestItem).where(
-                models.InterestItem.user_id == user.id,
+                models.InterestItem.list_id == resolved_list_id,
                 models.InterestItem.property_id == property_id,
             )
         )
@@ -76,7 +83,7 @@ async def get_property(
     visit = (
         await db.execute(
             select(models.Visit).where(
-                models.Visit.user_id == user.id,
+                models.Visit.list_id == resolved_list_id,
                 models.Visit.property_id == property_id,
             )
         )

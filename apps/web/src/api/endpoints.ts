@@ -9,6 +9,8 @@ import type {
   GeoSuggestResponse,
   InterestListResponse,
   InterestItem,
+  InterestListsResponse,
+  ListMember,
   LoginRequest,
   PatchInterestRequest,
   PropertyDetailResponse,
@@ -56,20 +58,49 @@ export const geoApi = {
 }
 
 export const propertiesApi = {
-  get: (propertyId: string) =>
-    apiRequest<PropertyDetailResponse>(`/api/properties/${propertyId}`),
-  putVisit: (propertyId: string, visit: Visit) =>
+  get: (propertyId: string, listId?: string) => {
+    const q = listId ? `?listId=${encodeURIComponent(listId)}` : ''
+    return apiRequest<PropertyDetailResponse>(`/api/properties/${propertyId}${q}`)
+  },
+  putVisit: (propertyId: string, visit: Visit, listId?: string) =>
     apiRequest<Visit>(`/api/properties/${propertyId}/visit`, {
       method: 'PUT',
-      body: visit,
+      body: listId ? { ...visit, listId } : visit,
+    }),
+}
+
+export const interestListsApi = {
+  list: () => apiRequest<InterestListsResponse>('/api/interest/lists'),
+  get: (listId: string) =>
+    apiRequest<{ id: string; name: string; ownerUserId: string; members: ListMember[] }>(
+      `/api/interest/lists/${listId}`,
+    ),
+  invite: (listId: string, email: string) =>
+    apiRequest<ListMember>(`/api/interest/lists/${listId}/members`, {
+      method: 'POST',
+      body: { email },
+    }),
+  removeMember: (listId: string, userId: string) =>
+    apiRequest<void>(`/api/interest/lists/${listId}/members/${userId}`, {
+      method: 'DELETE',
     }),
 }
 
 export const interestApi = {
-  list: (state: 'active' | 'archived' = 'active', limit = 50, offset = 0) =>
-    apiRequest<InterestListResponse>(
-      `/api/interest?state=${state}&limit=${limit}&offset=${offset}`,
-    ),
+  list: (
+    state: 'active' | 'archived' = 'active',
+    limit = 50,
+    offset = 0,
+    listId?: string,
+  ) => {
+    const params = new URLSearchParams({
+      state,
+      limit: String(limit),
+      offset: String(offset),
+    })
+    if (listId) params.set('listId', listId)
+    return apiRequest<InterestListResponse>(`/api/interest?${params}`)
+  },
   create: (body: CreateInterestRequest) =>
     apiRequest<InterestItem>('/api/interest', { method: 'POST', body }),
   createExternal: (body: ExternalInterestRequest) =>
@@ -93,14 +124,21 @@ export const interestApi = {
 }
 
 export const calendarApi = {
-  list: (from: string, to: string) =>
-    apiRequest<CalendarResponse>(
-      `/api/calendar?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-    ),
-  sync: (interestIds?: string[]) =>
+  list: (from: string, to: string, listId?: string) => {
+    const params = new URLSearchParams({
+      from,
+      to,
+    })
+    if (listId) params.set('listId', listId)
+    return apiRequest<CalendarResponse>(`/api/calendar?${params}`)
+  },
+  sync: (interestIds?: string[], listId?: string) =>
     apiRequest<CalendarSyncResponse>('/api/calendar/sync', {
       method: 'POST',
-      body: interestIds ? { interestIds } : {},
+      body: {
+        ...(interestIds ? { interestIds } : {}),
+        ...(listId ? { listId } : {}),
+      },
     }),
 }
 

@@ -10,6 +10,7 @@ from app.db import models
 from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
+from app.interest.deps import require_membership, resolve_list_id
 from app.schemas.common import PageMeta, Visit, VisitStatus
 from app.schemas.interest import VisitListItem, VisitListResponse, VisitUpsertRequest
 
@@ -22,11 +23,13 @@ ALLOWED = {
 }
 
 
-async def _require_interest(db: AsyncSession, user_id: UUID, property_id: UUID) -> models.InterestItem:
+async def _require_interest_in_list(
+    db: AsyncSession, list_id: UUID, property_id: UUID
+) -> models.InterestItem:
     interest = (
         await db.execute(
             select(models.InterestItem).where(
-                models.InterestItem.user_id == user_id,
+                models.InterestItem.list_id == list_id,
                 models.InterestItem.property_id == property_id,
             )
         )
@@ -47,7 +50,8 @@ async def upsert_visit(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> Visit:
-    await _require_interest(db, user.id, property_id)
+    list_id = await resolve_list_id(db, user, body.list_id)
+    await _require_interest_in_list(db, list_id, property_id)
     prop = await db.get(models.Property, property_id)
     if prop is None:
         raise AppError(404, "not_found", "Property not found")
@@ -58,7 +62,7 @@ async def upsert_visit(
     existing = (
         await db.execute(
             select(models.Visit).where(
-                models.Visit.user_id == user.id,
+                models.Visit.list_id == list_id,
                 models.Visit.property_id == property_id,
             )
         )
@@ -70,7 +74,7 @@ async def upsert_visit(
 
     if existing is None:
         existing = models.Visit(
-            user_id=user.id,
+            list_id=list_id,
             property_id=property_id,
             status=body.status.value,
             at=body.at,
@@ -89,6 +93,7 @@ async def upsert_visit(
 @router.get("/visits", response_model=VisitListResponse)
 async def list_visits(
     status: VisitStatus | None = None,
+    list_id: UUID | None = Query(default=None, alias="listId"),
     from_: datetime | None = Query(default=None, alias="from"),
     to: datetime | None = None,
     limit: int = Query(default=50, ge=1, le=100),
@@ -96,7 +101,8 @@ async def list_visits(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> VisitListResponse:
-    q = select(models.Visit).where(models.Visit.user_id == user.id)
+    resolved_list_id = await resolve_list_id(db, user, list_id)
+    q = select(models.Visit).where(models.Visit.list_id == resolved_list_id)
     if status:
         q = q.where(models.Visit.status == status.value)
     if from_:
@@ -117,7 +123,7 @@ async def list_visits(
         interest = (
             await db.execute(
                 select(models.InterestItem).where(
-                    models.InterestItem.user_id == user.id,
+                    models.InterestItem.list_id == resolved_list_id,
                     models.InterestItem.property_id == v.property_id,
                 )
             )

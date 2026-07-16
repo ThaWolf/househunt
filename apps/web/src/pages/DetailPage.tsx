@@ -16,11 +16,13 @@ import { PriceNarrativeView } from '@/components/PriceNarrativeView'
 import { UserScoreInput } from '@/components/UserScoreInput'
 import { VisitControls } from '@/components/VisitControls'
 import { ZoneMapBlock } from '@/components/ZoneMapBlock'
+import { useActiveList } from '@/context/ActiveListContext'
 import { formatLocation, formatMoney } from '@/lib/format'
 import { resolveDataSource } from '@/lib/listingFidelity'
 
 export function DetailPage() {
   const { propertyId } = useParams<{ propertyId: string }>()
+  const { activeListId } = useActiveList()
   const [data, setData] = useState<PropertyDetailResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -37,15 +39,15 @@ export function DetailPage() {
     setLoading(true)
     setError(null)
     try {
-      const res = await propertiesApi.get(propertyId)
+      const res = await propertiesApi.get(propertyId, activeListId ?? undefined)
       setData(res)
       setUserScore(res.interest?.userScore ?? null)
       setComments(res.interest?.comments ?? '')
       setVisit(res.interest?.visit ?? { status: 'none', at: null })
 
-      if (res.interest?.state) {
+      if (res.interest?.state && activeListId) {
         const state = res.interest.state
-        const list = await interestApi.list(state, 100, 0)
+        const list = await interestApi.list(state, 100, 0, activeListId)
         const hit = list.items.find((i) => i.property.id === propertyId)
         setInterestId(hit?.id ?? null)
         if (hit) {
@@ -61,7 +63,7 @@ export function DetailPage() {
     } finally {
       setLoading(false)
     }
-  }, [propertyId])
+  }, [propertyId, activeListId])
 
   useEffect(() => {
     void load()
@@ -72,7 +74,10 @@ export function DetailPage() {
     setBusy(true)
     setMsg(null)
     try {
-      const item = await interestApi.create({ propertyId })
+      const item = await interestApi.create({
+        propertyId,
+        listId: activeListId ?? undefined,
+      })
       setInterestId(item.id)
       setMsg('Agregada a interés')
       await load()
@@ -99,7 +104,7 @@ export function DetailPage() {
         userScore,
         comments: comments || null,
       })
-      await propertiesApi.putVisit(propertyId, visit)
+      await propertiesApi.putVisit(propertyId, visit, activeListId ?? undefined)
       setMsg('Guardado')
       await load()
     } catch (err) {

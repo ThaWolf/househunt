@@ -12,6 +12,18 @@ vi.mock('@/api/endpoints', () => ({
   },
 }))
 
+vi.mock('@/context/ActiveListContext', () => ({
+  useActiveList: () => ({
+    activeListId: 'list-1',
+    activeList: { id: 'list-1', name: 'Mi lista', role: 'owner', memberCount: 1 },
+    lists: [],
+    loading: false,
+    error: null,
+    setActiveListId: vi.fn(),
+    refreshLists: vi.fn(),
+  }),
+}))
+
 const mockCreate = vi.mocked(interestApi.createExternal)
 
 function fakeItem(): InterestItem {
@@ -49,6 +61,7 @@ describe('AddExternalListingModal', () => {
 
     await waitFor(() => expect(mockCreate).toHaveBeenCalledWith({
       url: 'https://example.com/casa',
+      listId: 'list-1',
     }))
     expect(onAdded).toHaveBeenCalledTimes(1)
     expect(onClose).toHaveBeenCalledTimes(1)

@@ -4,9 +4,12 @@ import { ApiError } from '@/api/client'
 import { calendarApi, metaApi } from '@/api/endpoints'
 import type { CalendarEvent } from '@/api/types'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
+import { ListSelector } from '@/components/ListSelector'
+import { useActiveList } from '@/context/ActiveListContext'
 import { daysInMonthGrid, endOfMonth, startOfMonth } from '@/lib/format'
 
 export function CalendarPage() {
+  const { activeListId } = useActiveList()
   const [anchor, setAnchor] = useState(() => new Date())
   const [events, setEvents] = useState<CalendarEvent[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,13 +25,14 @@ export function CalendarPage() {
   })
 
   const load = useCallback(async () => {
+    if (!activeListId) return
     setLoading(true)
     setError(null)
     try {
       const from = startOfMonth(anchor).toISOString()
       const to = endOfMonth(anchor).toISOString()
       const [cal, meta] = await Promise.all([
-        calendarApi.list(from, to),
+        calendarApi.list(from, to, activeListId),
         metaApi.adapters().catch(() => null),
       ])
       setEvents(cal.events)
@@ -38,7 +42,7 @@ export function CalendarPage() {
     } finally {
       setLoading(false)
     }
-  }, [anchor])
+  }, [anchor, activeListId])
 
   useEffect(() => {
     void load()
@@ -61,7 +65,7 @@ export function CalendarPage() {
     setSyncing(true)
     setSyncMsg(null)
     try {
-      const res = await calendarApi.sync()
+      const res = await calendarApi.sync(undefined, activeListId ?? undefined)
       setSyncMsg(`Sincronizados: ${res.synced} · fallidos: ${res.failed}`)
     } catch (err) {
       if (err instanceof ApiError && err.code === 'feature_disabled') {
@@ -75,7 +79,7 @@ export function CalendarPage() {
     }
   }
 
-  if (loading) return <LoadingState label="Cargando calendario…" />
+  if (!activeListId || loading) return <LoadingState label="Cargando calendario…" />
   if (error && !events.length) {
     return <ErrorState message={error} onRetry={() => void load()} />
   }
@@ -93,7 +97,8 @@ export function CalendarPage() {
             Visitas agendadas · click en evento → detalle
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <ListSelector />
           <button
             type="button"
             className="hh-btn-ghost text-sm"

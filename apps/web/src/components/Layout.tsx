@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
+import { ActiveListProvider } from '@/context/ActiveListContext'
 
 const nav = [
   { to: '/search', label: 'Buscar' },
@@ -71,7 +72,13 @@ export function Layout() {
       </header>
 
       <main className="flex-1 mx-auto w-full max-w-6xl px-4 py-6">
-        <Outlet />
+        {isAuthenticated ? (
+          <ActiveListProvider>
+            <Outlet />
+          </ActiveListProvider>
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   )

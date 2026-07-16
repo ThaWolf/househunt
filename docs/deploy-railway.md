@@ -69,6 +69,10 @@ With `ADAPTER_USE_FIXTURES=false`, adapters need a Playwright Chromium browser. 
 
 Local: host API + `python -m playwright install chromium` (see root README). Compose uses the same slim image — live scrap in-container needs the Chromium bake-in above.
 
+**Migrations:** the Docker `CMD` runs `alembic upgrade head` on every deploy. After features that add migrations (e.g. `0003_interest_lists`), redeploy and confirm in logs that upgrade succeeded before smoke-testing prod.
+
+**Migrations:** the Docker `CMD` runs `alembic upgrade head` on every deploy. After features that add migrations (e.g. `0003_interest_lists`), redeploy and confirm in logs that upgrade succeeded before smoke-testing prod.
+
 ## 5. Google OAuth redirects (localhost vs prod)
 
 | Environment | `GOOGLE_OAUTH_REDIRECT_URI` | Also authorized in Google Console |

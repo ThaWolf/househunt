@@ -233,6 +233,31 @@ export interface Visit {
   at: string | null
 }
 
+export interface AddedByUser {
+  userId: string
+  displayName: string | null
+  email: string
+}
+
+export interface InterestListSummary {
+  id: string
+  name: string
+  role: 'owner' | 'collaborator'
+  memberCount: number
+}
+
+export interface InterestListsResponse {
+  items: InterestListSummary[]
+}
+
+export interface ListMember {
+  userId: string
+  email: string
+  displayName: string | null
+  role: 'owner' | 'collaborator'
+  joinedAt: string
+}
+
 export interface InterestFlags {
   state: InterestState | null
   userScore?: number | null
@@ -417,6 +442,7 @@ export interface InterestItem {
   visit: Visit
   comments: string | null
   commentFlag: boolean
+  addedBy?: AddedByUser | null
   createdAt: string
   updatedAt: string
   archivedAt: string | null
@@ -429,10 +455,12 @@ export interface InterestListResponse {
 
 export interface CreateInterestRequest {
   propertyId: string
+  listId?: string
 }
 
 export interface ExternalInterestRequest {
   url: string
+  listId?: string
 }
 
 export interface PatchInterestRequest {

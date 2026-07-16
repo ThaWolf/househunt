@@ -38,8 +38,11 @@ class User(Base):
     )
 
     refresh_tokens: Mapped[list[RefreshToken]] = relationship(back_populates="user")
-    interest_items: Mapped[list[InterestItem]] = relationship(back_populates="user")
-    visits: Mapped[list[Visit]] = relationship(back_populates="user")
+    owned_lists: Mapped[list[InterestList]] = relationship(back_populates="owner")
+    list_memberships: Mapped[list[InterestListMember]] = relationship(back_populates="user")
+    added_interest_items: Mapped[list[InterestItem]] = relationship(
+        back_populates="added_by", foreign_keys="InterestItem.added_by_user_id"
+    )
 
 
 class RefreshToken(Base):
@@ -101,13 +104,54 @@ class Property(Base):
     interest_items: Mapped[list[InterestItem]] = relationship(back_populates="property")
 
 
-class InterestItem(Base):
-    __tablename__ = "interest_items"
-    __table_args__ = (UniqueConstraint("user_id", "property_id", name="uq_user_property_interest"),)
+class InterestList(Base):
+    __tablename__ = "interest_lists"
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    owner_user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    name: Mapped[str] = mapped_column(String(128), nullable=False, default="Mi lista")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    owner: Mapped[User] = relationship(back_populates="owned_lists")
+    members: Mapped[list[InterestListMember]] = relationship(back_populates="list")
+    interest_items: Mapped[list[InterestItem]] = relationship(back_populates="list")
+    visits: Mapped[list[Visit]] = relationship(back_populates="list")
+
+
+class InterestListMember(Base):
+    __tablename__ = "interest_list_members"
+    __table_args__ = (UniqueConstraint("list_id", "user_id", name="uq_list_member"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    list_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("interest_lists.id", ondelete="CASCADE"), index=True
+    )
     user_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
+    joined_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    list: Mapped[InterestList] = relationship(back_populates="members")
+    user: Mapped[User] = relationship(back_populates="list_memberships")
+
+
+class InterestItem(Base):
+    __tablename__ = "interest_items"
+    __table_args__ = (UniqueConstraint("list_id", "property_id", name="uq_list_property_interest"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    list_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("interest_lists.id", ondelete="CASCADE"), index=True
+    )
+    added_by_user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=False
     )
     property_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), index=True
@@ -123,17 +167,20 @@ class InterestItem(Base):
     )
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    user: Mapped[User] = relationship(back_populates="interest_items")
+    list: Mapped[InterestList] = relationship(back_populates="interest_items")
+    added_by: Mapped[User] = relationship(
+        back_populates="added_interest_items", foreign_keys=[added_by_user_id]
+    )
     property: Mapped[Property] = relationship(back_populates="interest_items")
 
 
 class Visit(Base):
     __tablename__ = "visits"
-    __table_args__ = (UniqueConstraint("user_id", "property_id", name="uq_user_property_visit"),)
+    __table_args__ = (UniqueConstraint("list_id", "property_id", name="uq_list_property_visit"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    list_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid(as_uuid=True), ForeignKey("interest_lists.id", ondelete="CASCADE"), index=True
     )
     property_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), index=True
@@ -142,4 +189,4 @@ class Visit(Base):
     at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     google_event_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    user: Mapped[User] = relationship(back_populates="visits")
+    list: Mapped[InterestList] = relationship(back_populates="visits")

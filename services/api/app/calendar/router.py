@@ -11,6 +11,7 @@ from app.db import models
 from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
+from app.interest.deps import resolve_list_id
 from app.schemas.common import Visit, VisitStatus
 from app.schemas.interest import (
     CalendarEvent,
@@ -26,11 +27,13 @@ router = APIRouter(prefix="/calendar", tags=["calendar"])
 async def calendar_feed(
     from_: datetime | None = Query(default=None, alias="from"),
     to: datetime | None = None,
+    list_id: UUID | None = Query(default=None, alias="listId"),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> CalendarResponse:
+    resolved_list_id = await resolve_list_id(db, user, list_id)
     q = select(models.Visit).where(
-        models.Visit.user_id == user.id,
+        models.Visit.list_id == resolved_list_id,
         models.Visit.status.in_([VisitStatus.scheduled.value, VisitStatus.visited.value]),
     )
     if from_:
@@ -44,7 +47,7 @@ async def calendar_feed(
         interest = (
             await db.execute(
                 select(models.InterestItem).where(
-                    models.InterestItem.user_id == user.id,
+                    models.InterestItem.list_id == resolved_list_id,
                     models.InterestItem.property_id == v.property_id,
                 )
             )
@@ -83,6 +86,8 @@ async def calendar_sync(
             "feature_disabled",
             "Google Calendar sync is disabled (missing flag or OAuth secrets)",
         )
+    if body and body.list_id is not None:
+        await resolve_list_id(db, user, body.list_id)
     # Placeholder for real Google Calendar API sync
     _ = (body, user, db)
     return CalendarSyncResponse(synced=0, failed=0, errors=[])

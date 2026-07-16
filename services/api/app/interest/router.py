@@ -14,9 +14,11 @@ from app.db.base import get_db
 from app.db.models import User
 from app.errors import AppError
 from app.interest.amenities import amenities_highlight
+from app.interest.deps import require_membership, resolve_list_id
 from app.mappers import property_to_dto, raw_property_to_model
 from app.schemas.common import InterestState, PageMeta, Visit, VisitStatus
 from app.schemas.interest import (
+    AddedByUser,
     CreateInterestRequest,
     ExternalInterestRequest,
     InterestItem,
@@ -28,15 +30,27 @@ from app.scoring.appscore import compute_appscore
 router = APIRouter(prefix="/interest", tags=["interest"])
 
 
+def _added_by_dto(user: User | None) -> AddedByUser | None:
+    if user is None:
+        return None
+    return AddedByUser(
+        user_id=user.id,
+        display_name=user.display_name,
+        email=user.email,
+    )
+
+
 def _to_item(
     interest: models.InterestItem,
     visit: models.Visit | None,
+    added_by: User | None = None,
 ) -> InterestItem:
     prop = interest.property
     v = Visit(
         status=VisitStatus(visit.status) if visit else VisitStatus.none,
         at=visit.at.isoformat() if visit and visit.at else None,
     )
+    author = added_by or getattr(interest, "added_by", None)
     return InterestItem(
         id=interest.id,
         property=property_to_dto(prop),
@@ -47,45 +61,55 @@ def _to_item(
         visit=v,
         comments=interest.comments,
         comment_flag=bool(interest.comments and interest.comments.strip()),
+        added_by=_added_by_dto(author),
         created_at=interest.created_at,
         updated_at=interest.updated_at,
         archived_at=interest.archived_at,
     )
 
 
+async def _visits_for_list(
+    db: AsyncSession, list_id: UUID, property_ids: list[UUID]
+) -> dict[UUID, models.Visit]:
+    if not property_ids:
+        return {}
+    vres = await db.execute(
+        select(models.Visit).where(
+            models.Visit.list_id == list_id,
+            models.Visit.property_id.in_(property_ids),
+        )
+    )
+    return {v.property_id: v for v in vres.scalars().all()}
+
+
 @router.get("", response_model=InterestListResponse)
 async def list_interest(
     state: InterestState = Query(default=InterestState.active),
+    list_id: UUID | None = Query(default=None, alias="listId"),
     limit: int = Query(default=50, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestListResponse:
+    resolved_list_id = await resolve_list_id(db, user, list_id)
     base = select(models.InterestItem).where(
-        models.InterestItem.user_id == user.id,
+        models.InterestItem.list_id == resolved_list_id,
         models.InterestItem.state == state.value,
     )
     total = (
         await db.execute(select(func.count()).select_from(base.subquery()))
     ).scalar_one()
     result = await db.execute(
-        base.options(selectinload(models.InterestItem.property))
+        base.options(
+            selectinload(models.InterestItem.property),
+            selectinload(models.InterestItem.added_by),
+        )
         .order_by(models.InterestItem.updated_at.desc())
         .limit(limit)
         .offset(offset)
     )
     rows = list(result.scalars().all())
-    prop_ids = [r.property_id for r in rows]
-    visits_map: dict[UUID, models.Visit] = {}
-    if prop_ids:
-        vres = await db.execute(
-            select(models.Visit).where(
-                models.Visit.user_id == user.id,
-                models.Visit.property_id.in_(prop_ids),
-            )
-        )
-        visits_map = {v.property_id: v for v in vres.scalars().all()}
-
+    visits_map = await _visits_for_list(db, resolved_list_id, [r.property_id for r in rows])
     items = [_to_item(r, visits_map.get(r.property_id)) for r in rows]
     return InterestListResponse(
         items=items, meta=PageMeta(total=total, limit=limit, offset=offset)
@@ -98,6 +122,7 @@ async def create_interest(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
+    resolved_list_id = await resolve_list_id(db, user, body.list_id)
     prop = await db.get(models.Property, body.property_id)
     if prop is None:
         raise AppError(404, "not_found", "Property not found")
@@ -105,7 +130,7 @@ async def create_interest(
     existing = (
         await db.execute(
             select(models.InterestItem).where(
-                models.InterestItem.user_id == user.id,
+                models.InterestItem.list_id == resolved_list_id,
                 models.InterestItem.property_id == body.property_id,
             )
         )
@@ -114,15 +139,15 @@ async def create_interest(
         raise AppError(409, "interest_exists", "Interest already active or archived")
 
     interest = models.InterestItem(
-        user_id=user.id,
+        list_id=resolved_list_id,
+        added_by_user_id=user.id,
         property_id=body.property_id,
         state=InterestState.active.value,
     )
     db.add(interest)
     await db.flush()
-    await db.refresh(interest, attribute_names=["property"])
-    # ensure property loaded
     interest.property = prop
+    interest.added_by = user
     return _to_item(interest, None)
 
 
@@ -133,6 +158,7 @@ async def create_external_interest(
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
     """iter-9: pegar la URL de una publicación externa → Property + interés."""
+    resolved_list_id = await resolve_list_id(db, user, body.list_id)
     settings = get_settings()
     try:
         raw = await extract_listing(body.url)
@@ -161,7 +187,7 @@ async def create_external_interest(
     existing = (
         await db.execute(
             select(models.InterestItem).where(
-                models.InterestItem.user_id == user.id,
+                models.InterestItem.list_id == resolved_list_id,
                 models.InterestItem.property_id == prop.id,
             )
         )
@@ -170,14 +196,26 @@ async def create_external_interest(
         raise AppError(409, "interest_exists", "Esta publicación ya está en tus intereses")
 
     interest = models.InterestItem(
-        user_id=user.id,
+        list_id=resolved_list_id,
+        added_by_user_id=user.id,
         property_id=prop.id,
         state=InterestState.active.value,
     )
     db.add(interest)
     await db.flush()
     interest.property = prop
+    interest.added_by = user
     return _to_item(interest, None)
+
+
+async def _patchable_interest(
+    db: AsyncSession, user: User, interest_id: UUID
+) -> models.InterestItem:
+    interest = await db.get(models.InterestItem, interest_id)
+    if interest is None:
+        raise AppError(404, "not_found", "Interest not found")
+    await require_membership(db, user.id, interest.list_id)
+    return interest
 
 
 @router.patch("/{interest_id}", response_model=InterestItem)
@@ -187,9 +225,7 @@ async def patch_interest(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
-    interest = await db.get(models.InterestItem, interest_id)
-    if interest is None or interest.user_id != user.id:
-        raise AppError(404, "not_found", "Interest not found")
+    interest = await _patchable_interest(db, user, interest_id)
     data = body.model_dump(exclude_unset=True)
     if "user_score" in data:
         interest.user_score = data["user_score"]
@@ -199,15 +235,16 @@ async def patch_interest(
     await db.flush()
     prop = await db.get(models.Property, interest.property_id)
     interest.property = prop  # type: ignore[assignment]
+    added_by = await db.get(User, interest.added_by_user_id)
     visit = (
         await db.execute(
             select(models.Visit).where(
-                models.Visit.user_id == user.id,
+                models.Visit.list_id == interest.list_id,
                 models.Visit.property_id == interest.property_id,
             )
         )
     ).scalar_one_or_none()
-    return _to_item(interest, visit)
+    return _to_item(interest, visit, added_by)
 
 
 @router.post("/{interest_id}/archive", response_model=InterestItem)
@@ -216,15 +253,22 @@ async def archive_interest(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
-    interest = await db.get(models.InterestItem, interest_id)
-    if interest is None or interest.user_id != user.id:
-        raise AppError(404, "not_found", "Interest not found")
+    interest = await _patchable_interest(db, user, interest_id)
     interest.state = InterestState.archived.value
     interest.archived_at = datetime.now(timezone.utc)
     interest.updated_at = datetime.now(timezone.utc)
     await db.flush()
     interest.property = await db.get(models.Property, interest.property_id)  # type: ignore[assignment]
-    return _to_item(interest, None)
+    added_by = await db.get(User, interest.added_by_user_id)
+    visit = (
+        await db.execute(
+            select(models.Visit).where(
+                models.Visit.list_id == interest.list_id,
+                models.Visit.property_id == interest.property_id,
+            )
+        )
+    ).scalar_one_or_none()
+    return _to_item(interest, visit, added_by)
 
 
 @router.post("/{interest_id}/restore", response_model=InterestItem)
@@ -233,12 +277,19 @@ async def restore_interest(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> InterestItem:
-    interest = await db.get(models.InterestItem, interest_id)
-    if interest is None or interest.user_id != user.id:
-        raise AppError(404, "not_found", "Interest not found")
+    interest = await _patchable_interest(db, user, interest_id)
     interest.state = InterestState.active.value
     interest.archived_at = None
     interest.updated_at = datetime.now(timezone.utc)
     await db.flush()
     interest.property = await db.get(models.Property, interest.property_id)  # type: ignore[assignment]
-    return _to_item(interest, None)
+    added_by = await db.get(User, interest.added_by_user_id)
+    visit = (
+        await db.execute(
+            select(models.Visit).where(
+                models.Visit.list_id == interest.list_id,
+                models.Visit.property_id == interest.property_id,
+            )
+        )
+    ).scalar_one_or_none()
+    return _to_item(interest, visit, added_by)

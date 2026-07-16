@@ -77,6 +77,24 @@ export function fromLocalInputValue(local: string): string {
   return new Date(local).toISOString()
 }
 
+export function formatVisitDateTime(
+  iso: string | null | undefined,
+  status: 'none' | 'scheduled' | 'visited',
+): string | null {
+  if (status === 'none' || !iso) return null
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return null
+  const formatted = d.toLocaleString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+  if (status === 'visited') return `Visitada: ${formatted}`
+  return formatted
+}
+
 export function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1)
 }

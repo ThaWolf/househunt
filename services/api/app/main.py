@@ -16,6 +16,7 @@ from app.calendar.router import router as calendar_router
 from app.config import get_settings
 from app.errors import AppError, app_error_handler, http_exception_handler, validation_exception_handler
 from app.geo.router import router as geo_router
+from app.interest.lists_router import router as interest_lists_router
 from app.interest.router import router as interest_router
 from app.media.router import router as media_router
 from app.meta import router as meta_router
@@ -70,6 +71,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router, prefix="/api")
     app.include_router(properties_router, prefix="/api")
     app.include_router(interest_router, prefix="/api")
+    app.include_router(interest_lists_router, prefix="/api")
     app.include_router(visits_router, prefix="/api")
     app.include_router(calendar_router, prefix="/api")
     app.include_router(media_router, prefix="/api")

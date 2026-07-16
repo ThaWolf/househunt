@@ -52,6 +52,11 @@ class InterestState(str, Enum):
     archived = "archived"
 
 
+class ListMemberRole(str, Enum):
+    owner = "owner"
+    collaborator = "collaborator"
+
+
 class VisitStatus(str, Enum):
     none = "none"
     scheduled = "scheduled"

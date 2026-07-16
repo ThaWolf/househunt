@@ -2,17 +2,21 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ApiError } from '@/api/client'
 import { interestApi, propertiesApi } from '@/api/endpoints'
-import type { AmenityHighlight, InterestItem } from '@/api/types'
+import type { InterestItem } from '@/api/types'
 import { AddExternalListingModal } from '@/components/AddExternalListingModal'
 import { AppScoreBadge } from '@/components/AppScoreBadge'
 import { DataSourceBadge } from '@/components/DataSourceBadge'
 import { HousehuntPlaceholder } from '@/components/HousehuntPlaceholder'
+import { InviteCollaboratorsModal } from '@/components/InviteCollaboratorsModal'
+import { ListSelector } from '@/components/ListSelector'
 import { LoadingState, ErrorState } from '@/components/LoadingState'
 import { UserScoreInput } from '@/components/UserScoreInput'
+import { VisitDateCell } from '@/components/VisitDateCell'
+import { useActiveList } from '@/context/ActiveListContext'
 import { formatLocation, formatMoney, primaryImageUrl } from '@/lib/format'
 import { resolveDataSource } from '@/lib/listingFidelity'
 
-function AmenityCell({ items }: { items: AmenityHighlight[] }) {
+function AmenityCell({ items }: { items: InterestItem['amenitiesHighlight'] }) {
   if (!items?.length) {
     return <span className="text-ink-muted">—</span>
   }
@@ -35,25 +39,34 @@ function AmenityCell({ items }: { items: AmenityHighlight[] }) {
   )
 }
 
+function addedByLabel(item: InterestItem): string {
+  const ab = item.addedBy
+  if (!ab) return '—'
+  return ab.displayName?.trim() || ab.email
+}
+
 export function InterestPage() {
+  const { activeListId, activeList } = useActiveList()
   const [items, setItems] = useState<InterestItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
   const [showAddExternal, setShowAddExternal] = useState(false)
+  const [showInvite, setShowInvite] = useState(false)
 
   const load = useCallback(async () => {
+    if (!activeListId) return
     setLoading(true)
     setError(null)
     try {
-      const res = await interestApi.list('active')
+      const res = await interestApi.list('active', 50, 0, activeListId)
       setItems(res.items)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Error al cargar interés')
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [activeListId])
 
   useEffect(() => {
     void load()
@@ -87,6 +100,7 @@ export function InterestPage() {
   }
 
   async function markVisit(item: InterestItem, status: 'scheduled' | 'visited' | 'none') {
+    if (!activeListId) return
     try {
       const visit =
         status === 'none'
@@ -95,7 +109,7 @@ export function InterestPage() {
               status,
               at: item.visit?.at ?? new Date().toISOString(),
             }
-      await propertiesApi.putVisit(item.property.id, visit)
+      await propertiesApi.putVisit(item.property.id, visit, activeListId)
       setItems((prev) =>
         prev.map((i) => (i.id === item.id ? { ...i, visit } : i)),
       )
@@ -105,7 +119,7 @@ export function InterestPage() {
     }
   }
 
-  if (loading) return <LoadingState label="Cargando interés…" />
+  if (!activeListId || loading) return <LoadingState label="Cargando interés…" />
   if (error && !items.length) {
     return <ErrorState message={error} onRetry={() => void load()} />
   }
@@ -116,10 +130,20 @@ export function InterestPage() {
         <div>
           <h1 className="font-display text-4xl font-bold text-ink">Interés</h1>
           <p className="text-sm text-ink-muted">
-            Tabla densa — rooms, amenities (pileta/jardín), UserScore, visita.
+            Lista compartida — rooms, amenities, UserScore, visita.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <ListSelector />
+          {activeList?.role === 'owner' && (
+            <button
+              type="button"
+              className="hh-btn-ghost text-sm"
+              onClick={() => setShowInvite(true)}
+            >
+              Invitar
+            </button>
+          )}
           <button
             type="button"
             className="hh-btn-accent text-sm"
@@ -154,11 +178,12 @@ export function InterestPage() {
         </p>
       ) : (
         <div className="overflow-x-auto rounded border border-line bg-surface">
-          <table className="w-full min-w-[1020px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[1120px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-line bg-paper/80 text-[10px] uppercase tracking-wide text-ink-muted font-mono">
                 <th className="px-2 py-2 font-medium w-12" />
                 <th className="px-2 py-2 font-medium">Título</th>
+                <th className="px-2 py-2 font-medium">Agregado por</th>
                 <th className="px-2 py-2 font-medium">Precio</th>
                 <th className="px-2 py-2 font-medium">Localidad</th>
                 <th className="px-2 py-2 font-medium">Rooms</th>
@@ -166,6 +191,7 @@ export function InterestPage() {
                 <th className="px-2 py-2 font-medium">App</th>
                 <th className="px-2 py-2 font-medium">User</th>
                 <th className="px-2 py-2 font-medium">Visita</th>
+                <th className="px-2 py-2 font-medium">Fecha visita</th>
                 <th className="px-2 py-2 font-medium">💬</th>
                 <th className="px-2 py-2 font-medium">Acciones</th>
               </tr>
@@ -195,7 +221,7 @@ export function InterestPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-1.5 max-w-[220px]">
+                    <td className="px-2 py-1.5 max-w-[200px]">
                       <div className="mb-0.5">
                         <DataSourceBadge dataSource={dataSource} />
                       </div>
@@ -206,16 +232,19 @@ export function InterestPage() {
                         {item.property.title}
                       </Link>
                     </td>
+                    <td className="px-2 py-1.5 text-xs text-ink-muted max-w-[120px] truncate">
+                      {addedByLabel(item)}
+                    </td>
                     <td className="px-2 py-1.5 font-mono text-xs whitespace-nowrap">
                       {formatMoney(item.property.price)}
                     </td>
-                    <td className="px-2 py-1.5 text-xs text-ink-muted max-w-[140px] truncate">
+                    <td className="px-2 py-1.5 text-xs text-ink-muted max-w-[120px] truncate">
                       {formatLocation(item.property.address)}
                     </td>
                     <td className="px-2 py-1.5 font-mono text-xs">
                       {rooms ?? '—'}
                     </td>
-                    <td className="px-2 py-1.5 max-w-[200px]">
+                    <td className="px-2 py-1.5 max-w-[180px]">
                       <AmenityCell items={item.amenitiesHighlight ?? []} />
                     </td>
                     <td className="px-2 py-1.5">
@@ -230,7 +259,7 @@ export function InterestPage() {
                     </td>
                     <td className="px-2 py-1.5">
                       <select
-                        className="hh-input py-1 text-xs w-[110px]"
+                        className="hh-input py-1 text-xs w-[100px]"
                         value={item.visit?.status ?? 'none'}
                         onChange={(e) =>
                           void markVisit(
@@ -243,6 +272,9 @@ export function InterestPage() {
                         <option value="scheduled">scheduled</option>
                         <option value="visited">visited</option>
                       </select>
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <VisitDateCell visit={item.visit} />
                     </td>
                     <td className="px-2 py-1.5 text-center font-mono text-xs">
                       {item.commentFlag ? '●' : '·'}
@@ -269,6 +301,9 @@ export function InterestPage() {
           onClose={() => setShowAddExternal(false)}
           onAdded={onExternalAdded}
         />
+      )}
+      {showInvite && (
+        <InviteCollaboratorsModal onClose={() => setShowInvite(false)} />
       )}
     </div>
   )

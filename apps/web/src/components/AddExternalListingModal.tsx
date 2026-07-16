@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ApiError } from '@/api/client'
 import { interestApi } from '@/api/endpoints'
 import type { InterestItem } from '@/api/types'
+import { useActiveList } from '@/context/ActiveListContext'
 import { isValidPortalUrl } from '@/lib/listingFidelity'
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 /** iter-9 — pegar una URL de cualquier portal y sumarla a Intereses. */
 export function AddExternalListingModal({ onClose, onAdded }: Props) {
+  const { activeListId } = useActiveList()
   const [url, setUrl] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +25,10 @@ export function AddExternalListingModal({ onClose, onAdded }: Props) {
     setSubmitting(true)
     setError(null)
     try {
-      const item = await interestApi.createExternal({ url: url.trim() })
+      const item = await interestApi.createExternal({
+        url: url.trim(),
+        listId: activeListId ?? undefined,
+      })
       onAdded(item)
       onClose()
     } catch (err) {

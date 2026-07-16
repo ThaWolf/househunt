@@ -163,14 +163,18 @@ async def upsert_property(
     return row
 
 
+from app.interest.deps import ensure_default_list
+
+
 async def _interest_overlay(
     db: AsyncSession, user_id: UUID, property_ids: list[UUID]
 ) -> dict[UUID, models.InterestItem]:
     if not property_ids:
         return {}
+    default_list = await ensure_default_list(db, user_id)
     result = await db.execute(
         select(models.InterestItem).where(
-            models.InterestItem.user_id == user_id,
+            models.InterestItem.list_id == default_list.id,
             models.InterestItem.property_id.in_(property_ids),
         )
     )
@@ -182,9 +186,10 @@ async def _visits_overlay(
 ) -> dict[UUID, models.Visit]:
     if not property_ids:
         return {}
+    default_list = await ensure_default_list(db, user_id)
     result = await db.execute(
         select(models.Visit).where(
-            models.Visit.user_id == user_id,
+            models.Visit.list_id == default_list.id,
             models.Visit.property_id.in_(property_ids),
         )
     )
