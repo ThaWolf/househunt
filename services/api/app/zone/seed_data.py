@@ -92,7 +92,8 @@ def centroid_for(locality: str | None) -> tuple[float, float] | None:
         return LOCALITY_CENTROIDS["gonnet"]
     if "city bell" in key:
         return LOCALITY_CENTROIDS["city bell"]
-    if key.startswith("la plata"):
+    # "la plata" or admin labels like "partido de la plata" (iter-11 · P0-4)
+    if "la plata" in key:
         return LOCALITY_CENTROIDS["la plata"]
     return LOCALITY_CENTROIDS.get(key)
 
@@ -103,7 +104,7 @@ def seeds_for(locality: str | None) -> tuple[SeedPlace, ...]:
         return ZONE_SEEDS["gonnet"]
     if "city bell" in key:
         return ZONE_SEEDS["city bell"]
-    if key.startswith("la plata") or key == "la plata":
+    if "la plata" in key:
         return ZONE_SEEDS["la plata"]
     if key == "pilar":
         return ZONE_SEEDS["pilar"]

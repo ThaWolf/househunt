@@ -23,11 +23,12 @@ from app.adapters.amenities_parse import parse_amenities
 from app.adapters.browser import BrowserFetchError, browser_page, goto_html
 from app.adapters.listing_meta import detect_locality, detect_property_type
 from app.adapters.price_parse import parse_price
-from app.adapters.rooms_parse import parse_rooms
+from app.adapters.rooms_parse import parse_rooms_for_listing
 from app.adapters.types import RawProperty
 from app.adapters.veracity import is_banned_image_host
 from app.config import Settings, get_settings
 from app.schemas.common import DataSource, Operation, PortalId, PropertyType
+from app.zone.seed_data import centroid_for
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +85,30 @@ def _external_id(url: str, portal: PortalId | None) -> str:
     return f"ext-{digest}"
 
 
-# Runs in the page: collect JSON-LD blocks + OG/meta + title + candidate images.
+# Listing-scoped price selectors (E30 · iter-11): the aviso's own hero/detail
+# price, never "similar/related listings" widgets which pollute a whole-body scan.
+_LISTING_PRICE_SELECTORS = (
+    "p.titlebar__price",
+    "div.titlebar__price-mobile",
+    "p.form-main__price",
+    "p.fix-main__price",
+)
+
+# Markers that start a "similar listings" section — hero text is sliced before
+# the first one so price/room scans of the body never see neighbor cards.
+_SIMILAR_MARKERS = (
+    "propiedades similares",
+    "publicaciones similares",
+    "avisos relacionados",
+    "aviso relacionado",
+    "relacionad",
+    "similar",
+)
+
+# Runs in the page: collect JSON-LD blocks + OG/meta + title + candidate images
+# + listing-scoped price text + a "hero" body slice cut before similar listings.
 _EXTRACT_JS = r"""
-() => {
+({ listingPriceSelectors, similarMarkers }) => {
   const ld = [];
   for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
     const t = (s.textContent || '').trim();
@@ -103,12 +125,31 @@ _EXTRACT_JS = r"""
     const v = m.getAttribute('content') || '';
     if (v) ogImages.push(v);
   }
+
+  let listingPriceText = '';
+  for (const sel of listingPriceSelectors) {
+    const el = document.querySelector(sel);
+    const t = el && el.innerText && el.innerText.trim();
+    if (t) { listingPriceText = t; break; }
+  }
+
+  const fullBody = (document.body && document.body.innerText || '');
+  const lowerBody = fullBody.toLowerCase();
+  let cutIdx = -1;
+  for (const marker of similarMarkers) {
+    const idx = lowerBody.indexOf(marker);
+    if (idx >= 0 && (cutIdx === -1 || idx < cutIdx)) cutIdx = idx;
+  }
+  const heroSource = cutIdx > 0 ? fullBody.slice(0, cutIdx) : fullBody;
+
   return {
     ld,
     meta,
     ogImages,
     title: document.title || '',
-    bodyText: (document.body && document.body.innerText || '').slice(0, 4000),
+    bodyText: fullBody.slice(0, 4000),
+    listingPriceText,
+    heroBodyText: heroSource.slice(0, 1200),
   };
 }
 """
@@ -167,6 +208,12 @@ def _ld_pick(nodes: list[dict[str, Any]]) -> dict[str, Any]:
         addr = node.get("address")
         if isinstance(addr, dict) and "address" not in out:
             out["address"] = addr
+        geo = node.get("geo")
+        if isinstance(geo, dict) and "geo" not in out:
+            out["geo"] = geo
+        beds = node.get("numberOfBedrooms")
+        if beds is not None and "numberOfBedrooms" not in out:
+            out["numberOfBedrooms"] = beds
     return out
 
 
@@ -196,8 +243,22 @@ def _collect_images(ld: dict[str, Any], og_images: list[str], portal: PortalId |
     return images
 
 
-def _price(ld: dict[str, Any], meta: dict[str, str], body_text: str) -> tuple[float | None, str | None]:
-    # JSON-LD offers.price is the most reliable
+def _price(
+    ld: dict[str, Any],
+    meta: dict[str, str],
+    body_text: str,
+    *,
+    listing_price_text: str | None = None,
+    hero_body_text: str | None = None,
+) -> tuple[float | None, str | None]:
+    """Listing-scoped price (E30 · iter-11).
+
+    Priority: JSON-LD ``offers.price`` -> meta price -> DOM listing-scoped price
+    (``listing_price_text``) -> hero body slice (pre-"similares"). ``prefer_largest``
+    over the raw 4k body is PROHIBITED — it picks unrelated "similar listings"
+    prices instead of the aviso's own price (see RCA iter-11).
+    """
+    # 1-2. JSON-LD offers.price / meta price — most reliable when present.
     raw = ld.get("price")
     currency = ld.get("priceCurrency") or meta.get("product:price:currency")
     if raw is None:
@@ -207,14 +268,70 @@ def _price(ld: dict[str, Any], meta: dict[str, str], body_text: str) -> tuple[fl
         amount, cur = parse_price(str(text), default_currency=(currency or "USD"))
         if amount:
             return amount, (cur or currency or "USD")
-    # fallback: scan body — reject street heights; prefer largest marked price
+
+    # 3. DOM listing-scoped price (selectors already exclude "similares" widgets).
+    if listing_price_text:
+        amount, cur = parse_price(
+            listing_price_text,
+            default_currency="USD",
+            reject_street_numbers=True,
+        )
+        if amount:
+            return amount, (cur or currency or "USD")
+
+    # 4. Hero body slice, cut before "similares"/"relacionados" — first plausible
+    # match (never prefer_largest) so unrelated neighbor prices can't win.
+    hero = hero_body_text if hero_body_text is not None else (body_text or "")[:1200]
     amount, cur = parse_price(
-        body_text or "",
+        hero,
         default_currency="USD",
-        prefer_largest=True,
         reject_street_numbers=True,
     )
-    return amount, cur
+    return amount, (cur or currency)
+
+
+def _ld_bedrooms(ld: dict[str, Any]) -> int | None:
+    """JSON-LD ``numberOfBedrooms`` as int, when plausible (1..30)."""
+    raw = ld.get("numberOfBedrooms")
+    if raw is None:
+        return None
+    try:
+        n = int(float(str(raw).strip()))
+    except (TypeError, ValueError):
+        return None
+    return n if 1 <= n <= 30 else None
+
+
+def _geo_from_ld(ld: dict[str, Any]) -> tuple[float | None, float | None]:
+    """Real portal coordinates from JSON-LD ``geo`` (GeoCoordinates), if any."""
+    geo = ld.get("geo")
+    if not isinstance(geo, dict):
+        return None, None
+    try:
+        lat = geo.get("latitude")
+        lng = geo.get("longitude")
+        if lat is None or lng is None:
+            return None, None
+        return float(lat), float(lng)
+    except (TypeError, ValueError):
+        return None, None
+
+
+def _resolve_geo(ld: dict[str, Any], locality: str | None) -> tuple[float | None, float | None]:
+    """Portal geo if the page gave it; else a locality seed centroid (P0-4).
+
+    The seed fallback is intentionally still written onto ``geo_lat``/``geo_lng``
+    (not left null) so zone/map consumers reading the DB row directly get a
+    usable point; ``build_zone_report`` detects the seed match and reports it
+    as ``approximate``/``seed_locality`` rather than a false ``exact``.
+    """
+    lat, lng = _geo_from_ld(ld)
+    if lat is not None and lng is not None:
+        return lat, lng
+    centroid = centroid_for(locality)
+    if centroid:
+        return centroid
+    return None, None
 
 
 def _normalize_locality(
@@ -261,7 +378,13 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
                 await page.wait_for_timeout(1200)
             except Exception:
                 pass
-            data = await page.evaluate(_EXTRACT_JS)
+            data = await page.evaluate(
+                _EXTRACT_JS,
+                {
+                    "listingPriceSelectors": list(_LISTING_PRICE_SELECTORS),
+                    "similarMarkers": list(_SIMILAR_MARKERS),
+                },
+            )
     except BrowserFetchError as exc:
         raise ExternalExtractError("extract_failed", f"No se pudo abrir la publicación ({exc.code}).") from exc
     except Exception as exc:  # noqa: BLE001
@@ -272,6 +395,8 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
     og_images: list[str] = data.get("ogImages") or []
     page_title: str = data.get("title") or ""
     body_text: str = data.get("bodyText") or ""
+    listing_price_text: str = data.get("listingPriceText") or ""
+    hero_body_text: str = data.get("heroBodyText") or body_text[:1200]
 
     title = _first(ld.get("name"), meta.get("og:title"), page_title)
     if not title:
@@ -282,7 +407,13 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
     description = str(description).strip()[:4000] if description else None
 
     images = _collect_images(ld, og_images, portal)
-    amount, currency = _price(ld, meta, body_text)
+    amount, currency = _price(
+        ld,
+        meta,
+        body_text,
+        listing_price_text=listing_price_text or None,
+        hero_body_text=hero_body_text,
+    )
 
     prop_type = detect_property_type(url, title)
     if prop_type is PropertyType.other:
@@ -296,8 +427,11 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
     locality, neighborhood, province = _normalize_locality(
         url, title, description, body_text, ld_locality, ld_province
     )
-    rooms = parse_rooms(url, title, description, body_text)
+    rooms = parse_rooms_for_listing(
+        url, title, description, body_text, ld_bedrooms=_ld_bedrooms(ld)
+    )
     amenities = parse_amenities(title, description, body_text)
+    geo_lat, geo_lng = _resolve_geo(ld, locality)
 
     raw = RawProperty(
         portal=portal or PortalId.external,
@@ -313,6 +447,8 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
         address_province=province,
         address_locality=locality,
         address_neighborhood=neighborhood,
+        geo_lat=geo_lat,
+        geo_lng=geo_lng,
         rooms=rooms,
         amenities=amenities,
         images=images,

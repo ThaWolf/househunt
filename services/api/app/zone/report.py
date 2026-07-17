@@ -15,16 +15,24 @@ def build_zone_report(raw: RawProperty) -> ZoneReport:
     lng = raw.geo_lng
     geocode_status = GeocodeStatus.missing
     geocode_source: GeocodeSource | None = None
+    centroid = centroid_for(raw.address_locality)
 
     if lat is not None and lng is not None:
-        geocode_status = GeocodeStatus.exact
-        geocode_source = GeocodeSource.portal
-    else:
-        centroid = centroid_for(raw.address_locality)
-        if centroid:
-            lat, lng = centroid
+        # P0-4 (iter-11): extract may have persisted a seed centroid onto
+        # geo_lat/geo_lng when the portal gave no real coords (so downstream
+        # consumers reading the row directly still get a usable point). Detect
+        # that case by exact match against the seed table so the report keeps
+        # calling it "approximate/seed_locality" instead of a false "exact".
+        if centroid is not None and (lat, lng) == centroid:
             geocode_status = GeocodeStatus.approximate
             geocode_source = GeocodeSource.seed_locality
+        else:
+            geocode_status = GeocodeStatus.exact
+            geocode_source = GeocodeSource.portal
+    elif centroid:
+        lat, lng = centroid
+        geocode_status = GeocodeStatus.approximate
+        geocode_source = GeocodeSource.seed_locality
 
     poi: list[ZonePlace] = []
     commerce: list[ZonePlace] = []
