@@ -245,6 +245,37 @@ async def run_backfill(argv: list[str] | None = None) -> int:
                     break
                 continue
 
+            # Thin extract = bot wall / partial HTML. Never overwrite a richer DB row.
+            img_count = len(raw.images or [])
+            thin = (
+                raw.price_amount is None
+                and img_count == 0
+                and not (raw.address_locality or "").strip()
+            )
+            if thin:
+                outcomes.append(
+                    RowOutcome(
+                        portal=row.portal,
+                        external_id=row.external_id,
+                        ok=False,
+                        price=None,
+                        rooms=raw.rooms,
+                        amenities_count=len(raw.amenities or []),
+                        locality=raw.address_locality,
+                        geo_set=False,
+                        error="thin_extract: price=null imgs=0 locality=null (skipped apply)",
+                        critical=True,
+                    )
+                )
+                logger.error(
+                    "FAILED %s/%s: thin extract — refuse to overwrite existing row",
+                    row.portal,
+                    row.external_id,
+                )
+                if args.fail_fast:
+                    break
+                continue
+
             score = compute_appscore(raw, poi_enabled=settings.feature_poi)
             breakdown = score.breakdown.model_dump(by_alias=False)
 

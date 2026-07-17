@@ -373,9 +373,17 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
 
     try:
         async with browser_page(timeout_ms=timeout_ms) as page:
-            await goto_html(page, url, wait_bot_clear_seconds=6.0)
+            # AP/ZP often show a bot interstitial; live AP uses ~10s — keep margin.
+            await goto_html(page, url, wait_bot_clear_seconds=14.0)
             try:
-                await page.wait_for_timeout(1200)
+                await page.wait_for_timeout(2500)
+            except Exception:
+                pass
+            try:
+                await page.wait_for_selector(
+                    ", ".join(_LISTING_PRICE_SELECTORS),
+                    timeout=10000,
+                )
             except Exception:
                 pass
             data = await page.evaluate(
@@ -432,6 +440,20 @@ async def extract_listing(url: str, *, settings: Settings | None = None) -> RawP
     )
     amenities = parse_amenities(title, description, body_text)
     geo_lat, geo_lng = _resolve_geo(ld, locality)
+
+    # Bot walls (e.g. Argenprop "Human Verification") still yield a title + slug rooms.
+    # Refuse thin / challenge payloads that would wipe richer DB rows on backfill.
+    title_l = title.lower()
+    bot_wall = any(
+        m in title_l
+        for m in ("human verification", "just a moment", "attention required", "captcha", "access denied")
+    )
+    thin = amount is None and not images and not (locality or "").strip()
+    if bot_wall or thin:
+        raise ExternalExtractError(
+            "extract_failed",
+            "Extracción incompleta (posible bloqueo del portal). Reintentá más tarde.",
+        )
 
     raw = RawProperty(
         portal=portal or PortalId.external,

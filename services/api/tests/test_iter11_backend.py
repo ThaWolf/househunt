@@ -9,6 +9,8 @@ while the page body also carries unrelated "similar listings" prices
 
 from __future__ import annotations
 
+import pytest
+
 from app.adapters.external.extract import (
     _geo_from_ld,
     _ld_bedrooms,
@@ -353,3 +355,42 @@ async def test_backfill_external_pipeline_end_to_end(tmp_path, monkeypatch):
         assert row.app_score is not None
     await engine2.dispose()
     get_settings.cache_clear()
+
+
+
+@pytest.mark.asyncio
+async def test_extract_raises_on_bot_wall_title(monkeypatch):
+    from unittest.mock import AsyncMock
+
+    from app.adapters.external.extract import ExternalExtractError, extract_listing
+
+    class FakePage:
+        async def wait_for_timeout(self, *_a, **_k):
+            return None
+
+        async def wait_for_selector(self, *_a, **_k):
+            return None
+
+        async def evaluate(self, *_a, **_k):
+            return {
+                "ld": [],
+                "meta": {},
+                "ogImages": [],
+                "title": "Human Verification",
+                "bodyText": "x" * 500,
+                "listingPriceText": "",
+                "heroBodyText": "",
+            }
+
+    class CM:
+        async def __aenter__(self):
+            return FakePage()
+
+        async def __aexit__(self, *exc):
+            return False
+
+    monkeypatch.setattr("app.adapters.external.extract.browser_page", lambda **_k: CM())
+    monkeypatch.setattr("app.adapters.external.extract.goto_html", AsyncMock())
+    with pytest.raises(ExternalExtractError) as ei:
+        await extract_listing("https://www.argenprop.com/casa--16928305")
+    assert "bloqueo" in ei.value.message.lower() or "incompleta" in ei.value.message.lower()
