@@ -60,3 +60,19 @@ Set `ADAPTER_USE_FIXTURES=true` only for offline demos once you add verified `fi
 # Playwright browsers (first time)
 python -m playwright install chromium
 ```
+
+## Backfill external listings (iter-11)
+
+Re-extracts + rescores already-saved `data_source=external` Properties (e.g. after
+an extractor fix) without users re-pasting URLs. Sequential Playwright, safe for
+Railway one-off runs. See `app/scripts/backfill_external.py` and
+`API_CONTRACT.md` §12 / `ARCHITECTURE.md` §17 in the agent-army hub for the
+full contract.
+
+```bash
+# All external Properties (default scope)
+python -m app.scripts.backfill_external
+
+# Scoped smoke (CSV of external_id, or --interest-list-id / --user-email)
+python -m app.scripts.backfill_external --external-ids 16928305,19247558 --dry-run
+```
